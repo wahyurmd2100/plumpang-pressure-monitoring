@@ -1,0 +1,162 @@
+﻿@model CSL.Web.Models.Product
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+<head>
+    @section Scripts{
+        <script type="text/javascript" asp-append-version="true">
+            var oTable;
+            $(document).ready(function () {
+                oTable= $('#tb-tank').DataTable(
+                    {
+                        "serverSide": true, // for process server side
+                        "scrollY": true,
+                        "scrollX": true,
+                        "autoWidth": false,
+                        "scrollCollapse": true,
+                        "paging": true,
+                        "fixedColumns": true,
+                        "processing": true,
+                        "ajax": {
+                            "url": "@Url.Action("LoadData")",
+                            "type": "POST",
+                            "datatype": "json"
+                        },
+                        "columnDefs": [{
+                            "targets": 0,
+                            "visible": false,
+                            "searchable": false
+                        }],
+                        "columns": [
+                            { "data": "tankId", "name": "TankId", "autoWidth": true },
+                            {
+                                data: null,
+                                render: function (data, type, full, meta) {
+                                    console.log(full);
+                                    return "<button type='button' class='btn btn-warning'onclick=UpdateData('" + full.tankId + "');><i class='fas fa-edit fa-lg'></i> Edit</button> <button type='button' class='btn btn-danger' onclick=DeleteData('" + full.tankId + "');><i class='fas fa-trash-alt'></i>Delete</button>";
+                                }
+                            },
+                            { "data": "name", "name": "Name", "autoWidth": true },
+                            { "data": "productName", "name": "Product", "autoWidth": true },
+                            { "data": "tankVolume", "name": "TankVolume", "autoWidth": true },
+                            { "data": "tankHeight", "name": "TankHeight", "autoWidth": true },
+                            { "data": "isUsed", "name": "IsUsed", "autoWidth": true },
+                            { "data": "isAutoPI", "name": "IsAutoPI", "autoWidth": true },
+                            //{ "data": "tankDiameter", "name": "TankDiameter", "autoWidth": true },
+                            //{ "data": "tankForm", "name": "TankForm", "autoWidth": true },
+                            //{ "data": "heightSafeCapacity", "name": "HeightSafeCapacity", "autoWidth": true },
+                            //{ "data": "heightVolMax", "name": "HeightVolMax", "autoWidth": true },
+                            //{ "data": "heightPointDesk", "name": "HeightPointDesk", "autoWidth": true },
+                            //{ "data": "heightTankBase", "name": "HeightTankBase", "autoWidth": true },
+                            //{ "data": "heightDeadStock", "name": "HeightDeadStock", "autoWidth": true },
+                            //{ "data": "stretchCoefficient", "name": "StretchCoefficient", "autoWidth": true },
+                            //{ "data": "densityCalibrate", "name": "DensityCalibrate", "autoWidth": true },
+                            //{ "data": "raisePerMM", "name": "RaisePerMM", "autoWidth": true },
+                            //{ "data": "deadstockVolume", "name": "DeadstockVolume", "autoWidth": true },
+                        ]
+                    }
+                );
+            });//end document ready
+            //update data
+            function UpdateData(tankId) {
+                var toSend =
+                {
+                    id: tankId
+                };
+                $.ajax({
+                    type: "GET",
+                    contentType: "application/json; charset=utf-8",
+                    url: "@Url.Action("AddOrEdit")",
+                    data: toSend,
+                    success: function (res) {
+                        jQuery.noConflict();
+                        $("#form-modal").modal();
+                        $("#form-modal .modal-body").html(res);
+                        $("#form-modal .modal-title").html('Edit Tank');
+                        $("#form-modal").modal('show');
+                    },
+                    error: function (res) {
+                        console.log(res);
+                    }
+                })
+            }
+            //start delete data
+            function DeleteData(tankId) {
+                if (confirm('Are you sure want to delete this data ?')) {
+                    var toSend =
+                    {
+                        id: tankId
+                    };
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("Delete")",
+                        data: toSend,
+                        success: function (res) {
+                            oTable = $('#tb-tank').DataTable();
+                            oTable.ajax.reload(null, false);
+                        },
+                        error: function (err) {
+                            console.log(err);
+                        }
+                    })
+                }
+            }
+        </script>
+    }
+</head>
+
+    <!-- Begin Page Content -->
+    <div class="container-fluid" style="width: 100%;">
+
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Tank List</h1>
+            <a value="reload" onclick="document.location.reload(true)" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
+                <i class="fas fa-redo-alt"></i>
+            </a>
+        </div>
+
+        <!-- Submain Content -->
+        <div class="card shadow-lg rounded" style="font-size:12px;">
+            <div class="card-header bg-gradient-info"></div>
+            <div class="card-body">
+
+                <!-- Tank Filter -->
+                <form>
+                    <div class="form-row">
+                        <div class="col col-md-3">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="Tank-Name">Tank Name</span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Insert Tank name" aria-label="Tank-name" id="tank-name" aria-describedby="Tank-name">
+                            </div>
+                        </div>
+                        <div class="col col-md-3">
+                            <div class="input-group">
+                                <button type="reset" class="btn btn-warning" style="width: 100%;" onclick="javascript:reset();"><i class="fas fa-undo-alt"></i> Reset Filter</button>
+                            </div>
+                        </div>
+                        <div class="col col-md-3">
+                            <div class="input-group">
+                                <button type="button" class="btn btn-primary" style="width: 100%;" onclick="showInPopup('@Url.Action("AddOrEdit","Tanks",null,Context.Request.Scheme)','Add New Tank')"><i class="fas fa-plus"></i> New</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- End Tank Filter -->
+                <!-- Divider -->
+                <hr class="sidebar-divider my-3">
+
+                <!-- Tank Table -->
+                @await Html.PartialAsync("_ViewAll", Model)
+                <!-- End Tank table -->
+
+            </div>
+        </div>
+        <!-- End Submain Content -->
+
+    </div>
+    <!-- End Page Content -->
