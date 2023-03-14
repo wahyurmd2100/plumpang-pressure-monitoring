@@ -246,77 +246,77 @@ namespace TMS.Web.Controllers
             return Json(tankhistorical);
         }
         //POST : Tankticket by ID
-        public IActionResult PostData(int id)
-        {
-            TankDipPosting.ResponseCode _responseCode = new TankDipPosting.ResponseCode();
-            var ticket = _context.Tank_Ticket.FirstOrDefault(t => t.Id == id);
-            if (ticket != null)
-            {
-                _responseCode = UploadingTicket(ticket);
-                if(_responseCode.Type == "S")
-                {
-                    ticket.Is_Upload_Success = 1;
-                    ticket.SAP_Response = _responseCode.DescMsg;
-                }
-                else if(_responseCode.Type == "E")
-                {
-                    ticket.Is_Upload_Success = 0;
-                    ticket.SAP_Response = _responseCode.DescMsg;
-                }
-                _context.Update(ticket);
-                _context.SaveChangesAsync();
-            }
-            return Json(_responseCode);
-        }
+        //public IActionResult PostData(int id)
+        //{
+        //    //TankDipPosting.ResponseCode _responseCode = new TankDipPosting.ResponseCode();
+        //    //var ticket = _context.Tank_Ticket.FirstOrDefault(t => t.Id == id);
+        //    //if (ticket != null)
+        //    //{
+        //    //    _responseCode = UploadingTicket(ticket);
+        //    //    if(_responseCode.Type == "S")
+        //    //    {
+        //    //        ticket.Is_Upload_Success = 1;
+        //    //        ticket.SAP_Response = _responseCode.DescMsg;
+        //    //    }
+        //    //    else if(_responseCode.Type == "E")
+        //    //    {
+        //    //        ticket.Is_Upload_Success = 0;
+        //    //        ticket.SAP_Response = _responseCode.DescMsg;
+        //    //    }
+        //    //    _context.Update(ticket);
+        //    //    _context.SaveChangesAsync();
+        //    //}
+        //    //return Json(_responseCode);
+        //}
         //process uploading tankticket
-        private TankDipPosting.ResponseCode UploadingTicket(TankTicket ticket)
-        {
-            TankDipPosting.ResponseCode responseCode = new TankDipPosting.ResponseCode();
-            //read configuration
-            TankConfiguration tankConfiguration = new TankConfiguration();
-            tankConfiguration = _configuration.GetSection("TankConfiguration").Get<TankConfiguration>();
-            string url = tankConfiguration.UrlPosting;
-            Tank tank = _context.Tank.FirstOrDefault(t => t.TankId == ticket.Tank_Id);
-            #region Initial value
-            TankDipPosting.DippingDataDelivery data = new TankDipPosting.DippingDataDelivery();
-            data.plant = tankConfiguration.PlantCode;
-            data.dipDate = ((DateTime)ticket.Timestamp).ToString("ddMMyyyy");
-            data.dipTime = ((DateTime)ticket.Timestamp).ToString("HHmm");
-            data.dipTank = ConvertTankNumberToSAPTankNumber(tank.Name);
-            data.dipEvent = ConvertStatusToDipEvent(ticket.Operation_Status);
-            data.dipOperation = ticket.Operation_Type;
-            data.totalHeight = ticket.Liquid_Level.ToString();
-            data.totalHeightUOM = "MM";
-            data.waterHeight = ticket.Water_Level.ToString();
-            data.waterHeightUOM = "MM";
-            data.celciusMaterialTemp = ticket.Liquid_Temperature.ToString("0.00");
-            data.celciusMaterialTemp = data.celciusMaterialTemp.Replace('.', ',');
-            data.celciusTestTemp = ticket.Liquid_Temperature.ToString("0.00");
-            data.celciusTestTemp = data.celciusTestTemp.Replace('.', ',');
-            data.kglDensity = ticket.Liquid_Density.ToString("0.0000");
-            data.kglDensity = data.kglDensity.Replace('.', ',');
-            #endregion
-            //create service
-            string password = string.Format("{0}{1}{2}{3}", data.plant, data.dipDate, data.dipTime, data.dipOperation);
-            //request
-            TankDipPosting.DoPostingRequestBody Body = new TankDipPosting.DoPostingRequestBody();
-            Body.dipData = data;
-            Body.User = data.plant;
-            Body.Password = password;
-            TankDipPosting.DoPostingRequest request = new TankDipPosting.DoPostingRequest();
-            request.Body = Body;
+        //private TankDipPosting.ResponseCode UploadingTicket(TankTicket ticket)
+        //{
+        //    TankDipPosting.ResponseCode responseCode = new TankDipPosting.ResponseCode();
+        //    //read configuration
+        //    TankConfiguration tankConfiguration = new TankConfiguration();
+        //    tankConfiguration = _configuration.GetSection("TankConfiguration").Get<TankConfiguration>();
+        //    string url = tankConfiguration.UrlPosting;
+        //    Tank tank = _context.Tank.FirstOrDefault(t => t.TankId == ticket.Tank_Id);
+        //    #region Initial value
+        //    TankDipPosting.DippingDataDelivery data = new TankDipPosting.DippingDataDelivery();
+        //    data.plant = tankConfiguration.PlantCode;
+        //    data.dipDate = ((DateTime)ticket.Timestamp).ToString("ddMMyyyy");
+        //    data.dipTime = ((DateTime)ticket.Timestamp).ToString("HHmm");
+        //    data.dipTank = ConvertTankNumberToSAPTankNumber(tank.Name);
+        //    data.dipEvent = ConvertStatusToDipEvent(ticket.Operation_Status);
+        //    data.dipOperation = ticket.Operation_Type;
+        //    data.totalHeight = ticket.Liquid_Level.ToString();
+        //    data.totalHeightUOM = "MM";
+        //    data.waterHeight = ticket.Water_Level.ToString();
+        //    data.waterHeightUOM = "MM";
+        //    data.celciusMaterialTemp = ticket.Liquid_Temperature.ToString("0.00");
+        //    data.celciusMaterialTemp = data.celciusMaterialTemp.Replace('.', ',');
+        //    data.celciusTestTemp = ticket.Liquid_Temperature.ToString("0.00");
+        //    data.celciusTestTemp = data.celciusTestTemp.Replace('.', ',');
+        //    data.kglDensity = ticket.Liquid_Density.ToString("0.0000");
+        //    data.kglDensity = data.kglDensity.Replace('.', ',');
+        //    #endregion
+        //    //create service
+        //    string password = string.Format("{0}{1}{2}{3}", data.plant, data.dipDate, data.dipTime, data.dipOperation);
+        //    //request
+        //    TankDipPosting.DoPostingRequestBody Body = new TankDipPosting.DoPostingRequestBody();
+        //    Body.dipData = data;
+        //    Body.User = data.plant;
+        //    Body.Password = password;
+        //    TankDipPosting.DoPostingRequest request = new TankDipPosting.DoPostingRequest();
+        //    request.Body = Body;
 
-            //Do Posting
-            TankDipPosting.ZMM_TANKDIP_DELIVERYSoapClient.EndpointConfiguration endpoint = new TankDipPosting.ZMM_TANKDIP_DELIVERYSoapClient.EndpointConfiguration();
-            TankDipPosting.ZMM_TANKDIP_DELIVERYSoapClient service = new TankDipPosting.ZMM_TANKDIP_DELIVERYSoapClient(endpoint, url);
-            TankDipPosting.DoPostingResponse response = new TankDipPosting.DoPostingResponse();
-            response = service.DoPosting(request);
-            //respon byd
-            TankDipPosting.DoPostingResponseBody responseBody = response.Body;
-            responseCode = responseBody.DoPostingResult;
-            return responseCode;
+        //    //Do Posting
+        //    TankDipPosting.ZMM_TANKDIP_DELIVERYSoapClient.EndpointConfiguration endpoint = new TankDipPosting.ZMM_TANKDIP_DELIVERYSoapClient.EndpointConfiguration();
+        //    TankDipPosting.ZMM_TANKDIP_DELIVERYSoapClient service = new TankDipPosting.ZMM_TANKDIP_DELIVERYSoapClient(endpoint, url);
+        //    TankDipPosting.DoPostingResponse response = new TankDipPosting.DoPostingResponse();
+        //    response = service.DoPosting(request);
+        //    //respon byd
+        //    TankDipPosting.DoPostingResponseBody responseBody = response.Body;
+        //    responseCode = responseBody.DoPostingResult;
+        //    return responseCode;
 
-        }
+        //}
         private string ConvertTankNumberToSAPTankNumber(string tanknumber)
         {
             string[] splits = tanknumber.Split('-');

@@ -69,48 +69,38 @@
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+        <h1 class="h4 mb-0 text-gray-800">Dashboard</h1>
         <a value="reload" onclick="document.location.reload(true)" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
             <i class="fas fa-redo-alt"></i>
         </a>
     </div>
 
     <!-- Tank Monitoring -->
-    <div class="card shadow mb-4 bg-white rounded">
-        <div class="card-header py-3">
-            <h5 class="m-0 font-weight-bold text-info">Tank Monitoring</h5>
-        </div>
-        <div class="card-body">           
-            <div class="row">
-                @{
-                    var tanks = ViewBag.Tanks;
-                }
-                @foreach (var tank in tanks)
-                {
-                    <div class="col-md-2 col-sm-6 mb-3">
-                        <div class="card text-center">
-                            <img src="~/assets/img/tank-mini2.png" class="card-img-top p-2" alt="...">
-                            <div class="card-body">
-                                <div class="card-title">
-                                    <h4><strong><u>@tank.Name</u></strong></h4>
-                                </div>
-                                <div style="height: 30px;">
-                                    <p class="card-text" style="font-size: larger;" id="@tank.TankId"></p>
-                                </div>
-                                <button type="button" class="btn btn-info" onclick="OpenModal(this);" value="@tank.TankId" style="width: 100%;">
-                                    Detail <i class="fas fa-arrow-right"></i>
-                                </button>
-                            </div>
-                            <div class="card-footer" style="height: 35px; background-color:@tank.HexColor ;">
-                                <p class="card-text" style="font-size: medium;">@tank.ProductName</p>
-                            </div>
-                        </div>
-                    </div>
-                }
+    <div class="row">
+    @{
+        var tanks = ViewBag.Tanks;
+    }
+    @foreach (var tank in tanks)
+    {
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-1 mb-3">
+            <div class="card shadow bg-white rounded">
+                <img src="~/assets/img/tank-mini2.webp" class="card-img-top p-2" style="border-bottom:5px solid @tank.HexColor;" alt="tank-picture">
+                
+                <div class="card-body py-2 px-3">
+                    <p class="card-title font-weight-bold mb-0" style="color:@tank.HexColor;">@tank.Name</p>
+                    <small class="card-title" style="color:@tank.HexColor;">@tank.ProductName</small>
+                        <p class="card-text" id="@tank.TankId">Initializing...</p>
+                </div>
+
+                <a type="button" class="card-footer btn btn-info bg-info" onclick="OpenModal(this);" value="@tank.TankId" style="width: 100%;">
+                    Detail <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
         </div>
+    }
     </div>
-        <!-- End Tank Monitoring -->
+    <!-- End Tank Monitoring -->
+
         <!-- Tank In Operation -->
         <div class="card shadow mb-4 rounded">
             <div class="card-header py-3">
@@ -142,6 +132,7 @@
             </div>
         </div>
         <!-- End Tank In Operation -->
+
         <!-- Product Stock -->
         <div class="card shadow mb-4 rounded">
             <div class="card-header py-3">

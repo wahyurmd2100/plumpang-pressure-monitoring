@@ -24,9 +24,9 @@
                             "url": "@Url.Action("LoadData")",
                             "type": "POST",
                             "datatype": "json",
-                            "success": function (result) {
-                                console.log(result);
-                            }
+                            //"success": function (result) {
+                            //    console.log(result);
+                            //}
                         },
                         "columnDefs": [{
                             "targets": 0,
@@ -38,6 +38,7 @@
                             {
                                 data: null,
                                 render: function (data, type, full, meta) {
+                                    //console.log(full);
                                     return "<button type='button' class='btn btn-warning' onclick=UpdateData('" + full.productId + "');><i class='fas fa-edit fa-lg'></i> Edit</button> <button type='button' class='btn btn-danger'onclick=DeleteData('" + full.productId + "');><i class='fas fa-trash-alt'></i>Delete</button>";
                                 }
                             },
@@ -117,7 +118,7 @@
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Fuel Oil</h1>
+        <h1 class="h3 mb-0 text-gray-800">Products</h1>
         <a value="reload" onclick="document.location.reload(true)" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
             <i class="fas fa-redo-alt"></i>
         </a>

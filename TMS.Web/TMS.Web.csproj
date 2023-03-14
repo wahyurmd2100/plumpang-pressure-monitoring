@@ -1933,14 +1933,4 @@
     <PackageReference Include="System.ServiceModel.Security" Version="4.9.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TMS.SAP\TMS.SAP.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="TMS.SAP">
-      <HintPath>..\TMS.SAP\bin\Debug\net6.0\TMS.SAP.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
