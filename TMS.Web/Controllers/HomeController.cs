@@ -39,13 +39,14 @@ namespace CSL.Web.Controllers
                              t.TankId,
                              p.Name,
                              x.ProductName,
-                             t.LiquidLevel,
-                             t.WaterLevel,
-                             t.LiquidTemperature,
-                             t.LiquidDensity,
-                             t.VolumeObserved,
-                             t.VolumeNetStandard,
+                             t.Level,
+                             t.Temperature,
+                             t.GrossVolume,
+                             t.NetVolume,
+                             t.Density,
+                             t.VCF,
                              t.TimeStamp,
+                             t.LiquidWeight
                          });
             return Json(tanks);
 

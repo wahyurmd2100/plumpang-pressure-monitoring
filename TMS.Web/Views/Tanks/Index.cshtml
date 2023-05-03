@@ -91,7 +91,7 @@
                     };
                     $.ajax({
                         type: "POST",
-                        url: "@Url.Action("Delete")",
+                        url: "@Url.Action("DeleteConfirmed")",
                         data: toSend,
                         success: function (res) {
                             oTable = $('#tb-tank').DataTable();

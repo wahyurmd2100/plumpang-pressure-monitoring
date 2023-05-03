@@ -48,12 +48,13 @@ namespace TMS.Web.Controllers
                                 p.Name,
                                 c.ProductName,
                                 t.TimeStamp,
-                                t.LiquidLevel,
-                                t.WaterLevel,
-                                t.LiquidTemperature,
-                                t.LiquidDensity,
-                                t.VolumeObserved,
-                                t.VolumeNetStandard
+                                t.Level,
+                                t.Temperature,
+                                t.GrossVolume,
+                                t.NetVolume,
+                                t.Density,
+                                t.VCF,
+                                t.LiquidWeight
                             });
                 //Sorting  
                 if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
@@ -68,9 +69,13 @@ namespace TMS.Web.Controllers
 
                 //total number of rows counts   
                 recordsTotal = tankLiveDatas.Count();
+                System.Diagnostics.Debug.WriteLine(recordsTotal);
                 //Paging   
                 var data = tankLiveDatas.Skip(skip).Take(pageSize).ToList();
+
+                //System.Diagnostics.Debug.WriteLine(data);
                 //Returning Json Data  
+                //return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = 13 });
                 return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });
             }
             catch (Exception)

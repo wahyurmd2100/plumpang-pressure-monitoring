@@ -25,7 +25,7 @@
                 <div class="sidebar-brand-icon">
                     @*<img src="~/assets/img/pertamina_logo.png" alt="Pertamina" width="60" height="40" class="mx-2">*@
                 </div>
-                <div class="sidebar-brand-text mx-2 text-white" style="font-size: small;">RADECO</div>
+                <div class="sidebar-brand-text mx-2 text-white" style="font-size: small;">TANK MONITORING SYSTEM</div>
             </a>
 
             <!-- Divider -->
@@ -33,9 +33,15 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
-                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
+                <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-home"></i>
+                    @*<i class="fas fa-fw fa-tachometer-alt"></i>*@
+                    <span>Home</span>
+                </a>
+                <a class="nav-link" asp-area="" asp-controller="TankLiveDatas" asp-action="Index">
+                    <i class="fas fa-table"></i>
+                    @*<i class="fas fa-fw fa-tachometer-alt"></i>*@
+                    <span>Live Data</span>
                 </a>
             </li>
 
@@ -123,14 +129,16 @@
                             <i class="fas fa-user-tag"></i>
                             User Role
                         </a>
-                        <a class="collapse-item" asp-area="" asp-controller="WebService" asp-action="Index">
+                        @*<a class="collapse-item" asp-area="" asp-controller="WebService" asp-action="Index">
                             <i class="fas fa-cogs"></i>
                             Web Service
-                        </a>
+                        </a>*@
                     </div>
                 </div>
             </li>
             <!-- End Nav Item - Administration Collapse Menu -->
+
+
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 
@@ -162,7 +170,7 @@
 
                 <!-- Topbar Title -->
                 <p class="navbar-item mt-3 font-weight-normal" style="font-size: 1.25vw; height: auto;">
-                    Tank Management System - RADECO
+                    PT. REDECO PETROLIN UTAMA
                 </p>
                 <!-- End Topbar Title -->
                 <!-- Topbar Navbar -->

@@ -17,6 +17,7 @@
                 console.log(tankLevelFixed);
                 document.getElementById(tankData.tankId).innerHTML = tankLevelFixed.toString() + " mm";
             }
+
             function loadData() {
                 $.ajax({
                     type: "POST",
@@ -77,27 +78,37 @@
 
     <!-- Tank Monitoring -->
     <div class="row">
-    @{
-        var tanks = ViewBag.Tanks;
-    }
-    @foreach (var tank in tanks)
-    {
-        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-1 mb-3">
-            <div class="card shadow bg-white rounded">
-                <img src="~/assets/img/tank-mini2.webp" class="card-img-top p-2" style="border-bottom:5px solid @tank.HexColor;" alt="tank-picture">
-                
-                <div class="card-body py-2 px-3">
-                    <p class="card-title font-weight-bold mb-0" style="color:@tank.HexColor;">@tank.Name</p>
-                    <small class="card-title" style="color:@tank.HexColor;">@tank.ProductName</small>
-                        <p class="card-text" id="@tank.TankId">Initializing...</p>
-                </div>
+        @{
+            var tanks = ViewBag.Tanks;
+        }
+        @foreach (var tank in tanks)
+        {
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-1 mb-3">
+                <div class="card shadow bg-white rounded">
+                    
+                        <img src="~/assets/img/tank-mini2.webp" class="card-img-top p-2" style="" alt="tank-picture" />
 
-                <a type="button" class="card-footer btn btn-info bg-info" onclick="OpenModal(this);" value="@tank.TankId" style="width: 100%;">
-                    Detail <i class="fas fa-arrow-right"></i>
-                </a>
+                    <div class="card-img-overlay align-items-center justify-content-center py-2" style="background-color:rgba(79, 86, 87, 0.2); border-top:5px solid @tank.HexColor;">
+                        <h3 class="card-title font-weight-bold mb-0 text-light">@tank.Name</h3>
+                        <small class="card-title text-white">@tank.ProductName</small>
+                        <p class="card-text text-white mb-0" id="@tank.TankId">Initializing...</p>
+                        <a type="button" class="btn btn-sm btn-info bg-info" onclick="OpenModal(this);" value="@tank.TankId">
+                            @tank.Name <i class="fas fa-arrow-right"></i>
+                        </a>
+                </div>
+                    
+                    
+                
+                    @*<div class="card-body py-2 px-3">
+                        <p class="card-title font-weight-bold mb-0" style="color:@tank.HexColor;">@tank.Name</p>
+                        <small class="card-title" style="color:@tank.HexColor;">@tank.ProductName</small>
+                        <p class="card-text" id="@tank.TankId">Initializing...</p>
+                    </div>*@
+
+                    
+                </div>
             </div>
-        </div>
-    }
+        }
     </div>
     <!-- End Tank Monitoring -->
 

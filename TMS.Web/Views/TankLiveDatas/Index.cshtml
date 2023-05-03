@@ -29,6 +29,9 @@
                             "visible": false,
                             "searchable": false
                         }],
+                        //header pada masing-masing data pakai huruf kecil. mirip dengan data yang di response dr ajaxnya.
+                        //contoh tadi Timestamp diganti timestamp karena header di responnya huruf kecil.
+                        //liatnya di browser 
                         "columns": [
                             { "data": "tankId", "name": "TankId", "autoWidth": true },
                             { "data": "name", "name": "Name", "autoWidth": true },
@@ -40,42 +43,28 @@
                                     return moment(value).format('DD MMM YYYY hh:mm');
                                 },
 
-                                "name": "TimeStamp", "autoWidth": true
+                                "name": "timeStamp", "autoWidth": true
                             },
                             {
-                                "data": "liquidLevel",
-                                render: function (data, type) {
-                                    return data.toFixed(0);
-                                },
-                                "name": "LiquidLevel", "autoWidth": true
+                                "data": "level",                                
+                                "name": "Level", "autoWidth": true
                             },
                             {
-                                "data": "waterLevel",
-                                render: function (data, type) {
-                                    return data.toFixed(2);
-                                },
-                                "name": "WaterLevel", "autoWidth": true
+                                "data": "temperature",
+                                "name": "Temperature", "autoWidth": true
                             },
                             {
-                                "data": "liquidTemperature",
-                                render: function (data, type) {
-                                    return data.toFixed(2);
-                                },
-                                "name": "LiquidTemperature", "autoWidth": true
+                                "data": "grossVolume",                                
+                                "name": "GrossVolume", "autoWidth": true
                             },
                             {
-                                "data": "liquidDensity",
-                                render: function (data, type) {
-                                    return data.toFixed(3);
-                                },
-                                "name": "LiquidDensity", "autoWidth": true
-                            },
-                            
-                            
-
+                                "data": "netVolume",                                
+                                "name": "NetVolume", "autoWidth": true
+                            },                         
                         ]
                 });
-                setInterval(reloadTable, 2000);
+                //setInterval(reloadTable, 2000); //ini dipakai untuk realtime data. tapi nanti dulu kalau sudah bener datanya.
+
             }); //end document ready
             function reloadTable() {
                 oTable.ajax.reload(null, false);

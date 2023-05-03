@@ -10,31 +10,45 @@ namespace TMS.ATGService.Models
 {
     public class TankLiveData
     {
-        //Foreign Key_
+        //Foreign Key
         [Key, ForeignKey("Tank")]
         public int TankId { get; set; }
-        [DisplayName("Liquid Level (mm)")]
+
+        [DisplayName("Level (mm)")]
         [DisplayFormat(DataFormatString = "{0:0.0000}", ApplyFormatInEditMode = true)]
-        public double LiquidLevel { get; set; }
-        [DisplayName("Water Level")]
+        public double Level { get; set; }
+
+        [DisplayName("Temperature (°C)")]
         [DisplayFormat(DataFormatString = "{0:0.0000}", ApplyFormatInEditMode = true)]
-        public double WaterLevel { get; set; }
-        [DisplayName("Liquid Temperature")]
+        public double Temperature { get; set; }
+
+        [DisplayName("Gross Volume (L)")]
         [DisplayFormat(DataFormatString = "{0:0.0000}", ApplyFormatInEditMode = true)]
-        public double LiquidTemperature { get; set; }
-        [DisplayName("Liquid Density")]
+        public double GrossVolume { get; set; }
+
+        [DisplayName("Net Volume (L)")]
         [DisplayFormat(DataFormatString = "{0:0.0000}", ApplyFormatInEditMode = true)]
-        public double LiquidDensity { get; set; }
-        [DisplayName("Volume Observed")]
+        public double NetVolume { get; set; }
+
+        [DisplayName("Density (g/cm³)")]
         [DisplayFormat(DataFormatString = "{0:0.0000}", ApplyFormatInEditMode = true)]
-        public double VolumeObserved { get; set; }
-        [DisplayName("Volume Net Standard")]
+        public double Density { get; set; }
+
+        [DisplayName("V.C.F")]
         [DisplayFormat(DataFormatString = "{0:0.0000}", ApplyFormatInEditMode = true)]
-        public double VolumeNetStandard { get; set; }
+        public double VCF { get; set; }
+
         [DisplayName("Timestamp")]
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM/dd/yyyy}")]
         public DateTime? TimeStamp { get; set; }
+
+        [DisplayName("Liquid Weight (M. Ton)")]
+        [DisplayFormat(DataFormatString = "{0:0.0000}", ApplyFormatInEditMode = true)]
+        public double LiquidWeight { get; set; }
+
+        //[DisplayName("Error")]
+        //public double Error { get; set; }
 
         public virtual Tank tank { get; set; }
     }

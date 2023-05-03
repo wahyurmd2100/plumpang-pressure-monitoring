@@ -49,11 +49,11 @@ namespace TMS.ATGService
                     #region update tank Live Data
                     TankLiveData tankLiveData = new TankLiveData();
                     tankLiveData = _dbHelper.GetTankLiveData(td.TankId);
-                    tankLiveData.LiquidLevel = ConvertToFloat(data[0], data[1]);
-                    tankLiveData.WaterLevel = ConvertToFloat(data[2], data[3]);
-                    tankLiveData.LiquidTemperature = ConvertToFloat(data[4], data[5])/10; //get temperature
-                    tankLiveData.LiquidDensity = ConvertToFloat(data[6], data[7])/1000; //get density
-                    tankLiveData.VolumeObserved = GetVolume(td.TankName, tankLiveData.LiquidLevel);
+                    tankLiveData.Level = ConvertToFloat(data[0], data[1]);
+                    tankLiveData.Temperature = ConvertToFloat(data[2], data[3]);
+                    tankLiveData.GrossVolume = ConvertToFloat(data[4], data[5])/10; //get temperature
+                    tankLiveData.Density = ConvertToFloat(data[6], data[7])/1000; //get density
+                    tankLiveData.NetVolume = GetVolume(td.TankName, tankLiveData.Level);
                     tankLiveData.TimeStamp = DateTime.Now;
                     _dbHelper.updateTnkLiveData(tankLiveData);
                     #endregion
