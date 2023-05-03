@@ -85,6 +85,21 @@
         {
             <div class="col-lg-3 col-md-3 col-sm-6 col-xs-1 mb-3">
                 <div class="card shadow bg-white rounded">
+                    <img src="~/assets/img/tank-mini2.webp" class="card-img-top p-2" style="border-bottom:5px solid @tank.HexColor;" alt="tank-picture">
+                
+                    <div class="card-body py-2 px-3">
+                        <p class="card-title font-weight-bold mb-0" style="color:@tank.HexColor;">@tank.Name</p>
+                        <small class="card-title" style="color:@tank.HexColor;">@tank.ProductName</small>
+                            <p class="card-text" id="@tank.TankId">Initializing...</p>
+                    </div>
+
+                    <a type="button" class="card-footer btn btn-info bg-info" onclick="OpenModal(this);" value="@tank.TankId" style="width: 100%;">
+                        Detail <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            @*<div class="col-lg-3 col-md-3 col-sm-6 col-xs-1 mb-3">
+                <div class="card shadow bg-white rounded">
                     
                         <img src="~/assets/img/tank-mini2.webp" class="card-img-top p-2" style="" alt="tank-picture" />
 
@@ -95,7 +110,7 @@
                         <a type="button" class="btn btn-sm btn-info bg-info" onclick="OpenModal(this);" value="@tank.TankId">
                             @tank.Name <i class="fas fa-arrow-right"></i>
                         </a>
-                </div>
+                </div>*@
                     
                     
                 
@@ -106,8 +121,8 @@
                     </div>*@
 
                     
-                </div>
-            </div>
+                @*</div>
+            </div>*@
         }
     </div>
     <!-- End Tank Monitoring -->
