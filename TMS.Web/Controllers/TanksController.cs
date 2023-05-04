@@ -135,6 +135,11 @@ namespace TMS.Web.Controllers
                 {
                     try
                     {
+                        TankLiveData tankLiveData = _context.Tank_Live_Data.FirstOrDefault(t=>t.TankId == id);
+                        if(tankLiveData == null)
+                        {
+                            tank.tankLiveData = new TankLiveData();
+                        }
                         tank.UpdateBy = User.Identity.Name;
                         tank.UpdateTime = DateTime.Now;
                         _context.Update(tank);

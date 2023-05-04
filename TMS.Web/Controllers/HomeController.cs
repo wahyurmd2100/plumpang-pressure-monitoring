@@ -38,6 +38,20 @@ namespace CSL.Web.Controllers
                          {
                              t.TankId,
                              p.Name,
+                             t.Level
+                         });
+            return Json(tanks);
+
+        }
+        public IActionResult GetDataByTankId(int Id)
+        {
+            var tanks = (from t in _context.Tank_Live_Data
+                         join p in _context.Tank on t.TankId equals p.TankId
+                         join x in _context.Master_Products on p.ProductId equals x.ProductId
+                         select new
+                         {
+                             t.TankId,
+                             p.Name,
                              x.ProductName,
                              t.Level,
                              t.Temperature,
@@ -48,8 +62,8 @@ namespace CSL.Web.Controllers
                              t.TimeStamp,
                              t.LiquidWeight
                          });
-            return Json(tanks);
-
+            var tank = tanks.FirstOrDefault(t => t.TankId == Id);
+            return Json(tank);
         }
         public IActionResult Privacy()
         {

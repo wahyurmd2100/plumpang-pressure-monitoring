@@ -6,24 +6,35 @@
 <head>
     @section Scripts{
         <script type="text/javascript">
+            var intervalModalShow;
+            var intervalHomeLoad;
+            var TankId;
             $(document).ready(function () {
-                setInterval(loadData, 1000);//realtime load data
+                jQuery.noConflict();
+                setInterval(realTimeData, 1000);
+                $("#viewModal").on('show.bs.modal', function () {
+                    intervalModalShow = setInterval(realTimeDataPopUp, 1000);
+                });
+                $('#viewModal').on('hidden.bs.modal', function () {
+                    clearInterval(intervalModalShow);
+                });
             });
             //end document
             function setDatatoTank(tankData) {
-                
-                let tankLevel = tankData.liquidLevel;
+                let tankLevel = tankData.level;
                 let tankLevelFixed = tankLevel.toFixed(2);
-                console.log(tankLevelFixed);
                 document.getElementById(tankData.tankId).innerHTML = tankLevelFixed.toString() + " mm";
             }
 
-            function loadData() {
+            function realTimeData() {
+                //console.log(TankId);
                 $.ajax({
                     type: "POST",
                     url: "@Url.Action("GetData")",
                     dataType: "json",
                     success: function (result) {
+                        //var data = JSON.stringify(result);
+                        //console.log(data);
                         for (tnk in result) {
                             setDatatoTank(result[tnk]);
                         }
@@ -35,15 +46,52 @@
 
                 });
             }
-           
+            function realTimeDataPopUp() {
+                var Id = {
+                    Id : TankId
+                };
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetDataByTankId")",
+                    dataType: "json",
+                    data: Id,
+                    success: function (result) {
+                        var persenLevel = result.level / 100;
+                        var persenVolume = result.grossVolume / 100;
+                        //progress bar level
+                        let progressBarLevel = document.getElementById("progLevel");
+                        progressBarLevel.value = persenLevel.toString() + "%";
+                        progressBarLevel.setAttribute("aria-valuenow", persenLevel);
+                        //progress bar volume
+                        let progressBarVolume = document.getElementById("progVolume");
+                        progressBarVolume.value = persenVolume.toString() + "%";
+                        progressBarVolume.setAttribute("aria-valuenow", persenVolume);
+                        //set table table 
+                        $("#tbName").text(result.name);
+                        $("#tbProduct").text(result.productName);
+                        $("#tbTimeStamp").text(result.timeStamp);
+                        $("#tbLevel").text(result.level);
+                        $("#tbTemp").text(result.temperature);
+                        $("#tbDensity").text(result.density);
+                        $("#tbGrossVolume").text(result.grossVolume);
+                        $("#tbNetVolume").text(result.netVolume);
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+
+                });
+            }
             function OpenModal(data)
             {
+                var value = data.value;
+                console.log("Modal Open");
+                TankId = value;
                 jQuery.noConflict();
                 $("#viewModal").modal();
-                console.log(data.value);
                 $("#viewModal").modal('show');
             }
-            
+
             function getRow()
             {
                  $.ajax({
@@ -93,170 +141,89 @@
                             <p class="card-text" id="@tank.TankId">Initializing...</p>
                     </div>
 
-                    <a type="button" class="card-footer btn btn-info bg-info" onclick="OpenModal(this);" value="@tank.TankId" style="width: 100%;">
+                    <button type="button" class="card-footer btn btn-info bg-info" onclick="OpenModal(this);" value="@tank.TankId" style="width: 100%;">
                         Detail <i class="fas fa-arrow-right"></i>
-                    </a>
+                    </button>
                 </div>
-            </div>
-            @*<div class="col-lg-3 col-md-3 col-sm-6 col-xs-1 mb-3">
-                <div class="card shadow bg-white rounded">
-                    
-                        <img src="~/assets/img/tank-mini2.webp" class="card-img-top p-2" style="" alt="tank-picture" />
-
-                    <div class="card-img-overlay align-items-center justify-content-center py-2" style="background-color:rgba(79, 86, 87, 0.2); border-top:5px solid @tank.HexColor;">
-                        <h3 class="card-title font-weight-bold mb-0 text-light">@tank.Name</h3>
-                        <small class="card-title text-white">@tank.ProductName</small>
-                        <p class="card-text text-white mb-0" id="@tank.TankId">Initializing...</p>
-                        <a type="button" class="btn btn-sm btn-info bg-info" onclick="OpenModal(this);" value="@tank.TankId">
-                            @tank.Name <i class="fas fa-arrow-right"></i>
-                        </a>
-                </div>*@
-                    
-                    
-                
-                    @*<div class="card-body py-2 px-3">
-                        <p class="card-title font-weight-bold mb-0" style="color:@tank.HexColor;">@tank.Name</p>
-                        <small class="card-title" style="color:@tank.HexColor;">@tank.ProductName</small>
-                        <p class="card-text" id="@tank.TankId">Initializing...</p>
-                    </div>*@
-
-                    
-                @*</div>
-            </div>*@
+            </div>            
         }
     </div>
-    <!-- End Tank Monitoring -->
-
-        <!-- Tank In Operation -->
-        <div class="card shadow mb-4 rounded">
-            <div class="card-header py-3">
-                <h5 class="m-0 font-weight-bold text-info">Tank In Operation</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="data-table" class="table table-striped table-bordered" style="width: 100%;">
-                        <thead>
-                            <tr>
-                                <th>Tank</th>
-                                <th>Product</th>
-                                <th>Type</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th>Tank</th>
-                                <th>Product</th>
-                                <th>Type</th>
-                                <th>Status</th>
-                            </tr>
-                        </tfoot>
-                    </table>
+</div>
+     @*Modal Detail Tank*@ 
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewModalLabel"><b>Tank Level Details</b></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-            </div>
-        </div>
-        <!-- End Tank In Operation -->
-
-        <!-- Product Stock -->
-        <div class="card shadow mb-4 rounded">
-            <div class="card-header py-3">
-                <h5 class="m-0 font-weight-bold text-info">Product Stocks</h5>
-            </div>
-            <div class="card-body">
-                <div class="chart-bar">
-                    <canvas id="myBarChart"></canvas>
-                </div>
-            </div>
-        </div>
-        <!-- End Product Stock -->
-    </div>
-<!-- Modal Detail Tank -->
-<div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="viewModalLabel"><b>Tank Level Details</b></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <img class="img-fluid p-0" src="~/assets/img/tank-mini2.png" alt="..." width="100%" height="100%">
-                            <p class="text-left mb-0">Percentage Tank Level</p>
-                            <div class="progress" style="height: 20px;">
-                                <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <img class="img-fluid p-0" src="~/assets/img/tank-mini2.webp" />
+                                <p class="text-left mb-0">Percentage Tank Level</p>
+                                <div class="progress" style="height: 20px;">
+                                    <div id="progLevel" class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <p class="text-left mb-0">Percentage Tank Volume</p>
+                                <div class="progress" style="height: 20px;">
+                                    <div id="progVolume" class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
                             </div>
-                            <p class="text-left mb-0">Percentage Tank Volume</p>
-                            <div class="progress" style="height: 20px;">
-                                <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                            <div class="col-md-6">
+                                <table class="table table-borderless table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row" style="padding: 8px;">Name</th>
+                                            <td style="padding: 8px;"> : </td>
+                                            <td id="tbName" style="padding: 8px;">&tilde;</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" style="padding: 8px;">Product</th>
+                                            <td style="padding: 8px;"> : </td>
+                                            <td id="tbProduct" style="padding: 8px;">&tilde;</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" style="padding: 8px;">Timestamp</th>
+                                            <td style="padding: 8px;"> : </td>
+                                            <td id="tbTimeStamp" style="padding: 8px;">&tilde;</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" style="padding: 8px;"> Level (mm)</th>
+                                            <td style="padding: 8px;"> : </td>
+                                            <td id="tbLevel" style="padding: 8px;">&tilde;</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" style="padding: 8px;">Temperature (&deg;C)</th>
+                                            <td style="padding: 8px;"> : </td>
+                                            <td id="tbTemp" style="padding: 8px;">&tilde;</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" style="padding: 8px;">Density (gr/m&sup3;)</th>
+                                            <td style="padding: 8px;"> : </td>
+                                            <td id="tbDensity" style="padding: 8px;">&tilde;</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" style="padding: 8px;">Gross Volume (L)</th>
+                                            <td style="padding: 8px;"> : </td>
+                                            <td id="tbGrossVolume" style="padding: 8px;">&tilde;</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" style="padding: 8px;">Net Volume (L)</th>
+                                            <td style="padding: 8px;"> : </td>
+                                            <td id="tbNetVolume" style="padding: 8px;">&tilde;</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table table-borderless table-sm">
-                                <tbody>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Name</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Product</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Timestamp</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Status</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Liquid Level (mm)</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Water Level (mm)</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Temperature (&deg;C)</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Density (gr/m&sup3;)</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Volume Observed (L)</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Volume Net Standard (L)</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                </tbody>
-                            </table>
                         </div>
                     </div>
-                </div>
 
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- End Modal Detail Tank -->
+     @*End Modal Detail Tank*@ 
