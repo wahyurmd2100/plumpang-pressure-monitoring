@@ -70,11 +70,11 @@
                         $("#tbName").text(result.name);
                         $("#tbProduct").text(result.productName);
                         $("#tbTimeStamp").text(result.timeStamp);
-                        $("#tbLevel").text(result.level);
-                        $("#tbTemp").text(result.temperature);
-                        $("#tbDensity").text(result.density);
-                        $("#tbGrossVolume").text(result.grossVolume);
-                        $("#tbNetVolume").text(result.netVolume);
+                        $("#tbLevel").text(result.level.toFixed(2));
+                        $("#tbTemp").text(result.temperature.toFixed(2));
+                        $("#tbDensity").text(result.density.toFixed(2));
+                        $("#tbGrossVolume").text(result.grossVolume.toFixed(2));
+                        $("#tbNetVolume").text(result.netVolume.toFixed(2));
                     },
                     error: function (err) {
                         console.log(err);
