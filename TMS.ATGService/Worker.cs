@@ -32,7 +32,7 @@ namespace TMS.ATGService
             while (!stoppingToken.IsCancellationRequested)
             {
                 UpdateData();
-                await Task.Delay(20000, stoppingToken);
+                await Task.Delay(1000, stoppingToken);
             }
         }
         //get data tank tank
@@ -50,8 +50,8 @@ namespace TMS.ATGService
                     TankLiveData tankLiveData = new TankLiveData();
                     tankLiveData = _dbHelper.GetTankLiveData(td.TankId);
                     tankLiveData.Level = ConvertToFloat(data[0], data[1]);
-                    tankLiveData.Temperature = ConvertToFloat(data[2], data[3]);
-                    tankLiveData.GrossVolume = ConvertToFloat(data[4], data[5])/10; //get temperature
+                    tankLiveData.Temperature = ConvertToFloat(data[2], data[3])/10; //get temperature
+                    tankLiveData.GrossVolume = ConvertToFloat(data[4], data[5]); 
                     tankLiveData.Density = ConvertToFloat(data[6], data[7])/1000; //get density
                     tankLiveData.NetVolume = GetVolume(td.TankName, tankLiveData.Level);
                     tankLiveData.TimeStamp = DateTime.Now;
@@ -102,10 +102,11 @@ namespace TMS.ATGService
                         TankTableDetail ttDetail = new TankTableDetail();
                         if (sheet.GetRow(row) != null)
                         {
-                            string data = sheet.GetRow(row).GetCell(0).ToString();
-                            string[] splitData = data.Split(";");
-                            ttDetail.Level = Convert.ToDouble(splitData[0]);
-                            ttDetail.Volume = Convert.ToDouble(splitData[1]);
+                            string data1 = sheet.GetRow(row).GetCell(0).ToString();
+                            string data2 = sheet.GetRow(row).GetCell(1).ToString();
+                            
+                            ttDetail.Level = Convert.ToDouble(data1);
+                            ttDetail.Volume = Convert.ToDouble(data2);
                             tankTable.TankTableDetails.Add(ttDetail);
                             //_logger.LogInformation("read data at: {time}, {0},{1}", DateTimeOffset.Now, ttDetail.Level, ttDetail.Volume);
                         }
