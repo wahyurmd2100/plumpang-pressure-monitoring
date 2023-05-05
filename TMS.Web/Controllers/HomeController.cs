@@ -61,8 +61,8 @@ namespace CSL.Web.Controllers
                              t.VCF,
                              t.TimeStamp,
                              t.LiquidWeight,
-                             persLevel = t.Level/p.TankHeight *100,
-                             persVolume = t.NetVolume / p.TankVolume *100,
+                             persLevel = p.TankHeight != 0? t.Level/p.TankHeight *100:0,
+                             persVolume =p.TankVolume !=0? t.NetVolume / p.TankVolume *100:0,
                          });
             var tank = tanks.FirstOrDefault(t => t.TankId == Id);
             return Json(tank);
