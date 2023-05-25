@@ -1,0 +1,169 @@
+﻿@model PressMon.Web.Models.TankHistorical
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+<head>
+    @section Scripts{
+        <script type="text/javascript">
+            var oTable;
+            $(document).ready(function () {
+                oTable = $('#tb-tankhistorical').DataTable({
+                        "serverSide": true, // for process server side
+                        "scrollY": true,
+                        "scrollX": true,
+                        "autoWidth": false,
+                        "scrollCollapse": true,
+                        "paging": true,
+                        "fixedColumns": true,
+                        "processing": false,
+                    "order": [[3, "desc"], [0, "asc"]],
+                        "pageLength": 50,
+
+                        "ajax": {
+                            "url":  "@Url.Action("LoadData")",
+                            "type": "POST",
+                            "datatype": "json",
+                            "data": function (d) {
+                                d.TankNameFilter = document.getElementById("tank-name").value;
+                                d.DateFrom = document.getElementById("min").value;
+                                d.DateTo = document.getElementById("max").value;
+                            }
+                        },
+                        "columnDefs": [{
+                            "targets": 0,
+                            "visible": false,
+                            "searchable": false
+                        }],
+                        "columns": [
+                            { "data": "tankId", "name": "TankId", "autoWidth": true },
+                            { "data": "name", "name": "Name", "autoWidth": true },
+                            { "data": "productName", "name": "productName", "autoWidth": true },
+                            {
+                                "data": "timeStamp",
+                                "render": function (value) {
+                                    if (value === null) return "";
+                                    return moment(value).format('DD MMM YYYY hh:mm');
+                                },
+
+                                "name": "TimeStamp", "autoWidth": true
+                            },
+                            {
+                                "data": "liquidLevel",
+                                render: function (data, type) {
+                                    return data.toFixed(0);
+                                },
+                                "name": "LiquidLevel", "autoWidth": true
+                            },
+                            {
+                                "data": "waterLevel",
+                                render: function (data, type) {
+                                    return data.toFixed(2);
+                                },
+                                "name": "WaterLevel", "autoWidth": true
+                            },
+                            {
+                                "data": "liquidTemperature",
+                                render: function (data, type) {
+                                    return data.toFixed(2);
+                                },
+                                "name": "LiquidTemperature", "autoWidth": true
+                            },
+                            {
+                                "data": "liquidDensity",
+                                render: function (data, type) {
+                                    return data.toFixed(3);
+                                },
+                                "name": "LiquidDensity", "autoWidth": true
+                            },
+
+
+
+                        ]
+                });
+                //setInterval(reloadTable, 2000);
+            }); //end document ready
+            function reloadTable() {
+                oTable.ajax.reload(null, false);
+            }
+            function reset() {
+                document.getElementById("min").value = "";
+                document.getElementById("max").value = "";
+                document.getElementById("tank").value = "";
+                reloadTable();
+            }
+            $(document).ready(function () {
+                // Create date inputs
+                minDate = new DateTime($('#min'), {
+                    format: 'D MMMM yyyy'
+                });
+                maxDate = new DateTime($('#max'), {
+                    format: 'D MMMM yyyy'
+                });
+            });
+        </script>
+    }
+
+</head>
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Tank Historical</h1>
+        <a value="reload" onclick="reloadTable()" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
+            <i class="fas fa-redo-alt"></i>
+        </a>
+    </div>
+
+    <!-- Submain Content -->
+    <div class="card shadow-lg rounded">
+        <div class="card-header bg-gradient-info"></div>
+        <div class="card-body">
+            <!-- Tank Filter -->
+            <form>
+                <div class="form-row">
+                    <div class="col col-md-3">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="min-date">Date From</span>
+                            </div>
+                            <input onchange="reloadTable();" type="text" name="min-date" id="min" class="form-control" placeholder="Start From" aria-label="Min-Date" aria-describedby="min-date" value="@DateTime.Now.ToString("dd MMMM yyyy")">
+                        </div>
+                    </div>
+                    <div class="col col-md-3">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="max-date">Date To</span>
+                            </div>
+                            <input onchange="reloadTable();" type="text" name="max-date" id="max" class="form-control" placeholder="Until" aria-label="Max-date" aria-describedby="max-date" value="@DateTime.Now.ToString("dd MMMM yyyy")">
+                        </div>
+                    </div>
+                    <div class="col col-md-3">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="tank">Tank</label>
+                            </div>
+                            <select id="tank-name" onchange="reloadTable();" class="custom-select" id="tank" asp-items=@(new SelectList(ViewBag.TankId,"TankId","Name"))>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col col-md-3">
+                        <div class="input-group">
+                            <button type="reset" class="btn btn-warning" style="width: 100%;" onclick="reset();"><i class="fas fa-undo-alt"></i> Reset Filter</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <!-- End Tank Filter -->
+            <!-- Divider -->
+            <hr class="sidebar-divider my-3">
+            <!-- Tank Table -->
+            @await Html.PartialAsync("_ViewAll", Model)
+            <!-- End Tank table -->
+        </div>
+    </div>
+    <!-- End Submain Content -->
+
+</div>
+<!-- End Page Content -->

@@ -1,0 +1,49 @@
+﻿@model PressMon.Web.Models.TankLiveData
+    <!-- Tank Table -->
+<div class="table-responsive">
+    <table id="tb-tanklivedata" class="table table-striped table-bordered dt-responsive nowrap" width="100%" cellspacing="0">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.TankId)
+                </th>
+                <th>Tank</th>
+                <th>Product</th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TimeStamp)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Level)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Temperature)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.GrossVolume)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.NetVolume)
+                </th>             
+
+            </tr>
+        </thead>
+        <!--<tbody>
+            <tr>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td style="text-align: center;">-->
+        <!-- Button trigger modal -->
+        <!--<button type="button" class="btn btn-warning" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-edit fa-lg"></i> Edit</button>
+                </td>
+            </tr>
+        </tbody>-->
+    </table>
+</div>
+<!-- End Tank table -->
