@@ -1,11 +1,11 @@
 using EasyModbus;
 using System.Text.Json;
-using PressMon.ATGService.Models;
+using PressMon.Service.Models;
 using NPOI.HSSF.UserModel;
 using NPOI.XSSF.UserModel;
 using NPOI.SS.UserModel;
 
-namespace PressMon.ATGService
+namespace PressMon.Service
 {
     public class Worker : BackgroundService
     {

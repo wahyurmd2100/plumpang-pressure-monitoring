@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CSL.Web
+namespace PressMon.Web
 {
     public class Program
     {

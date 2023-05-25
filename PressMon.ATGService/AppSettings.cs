@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace PressMon.ATGService
+namespace PressMon.Service
 {
     public static class AppSetting
     {

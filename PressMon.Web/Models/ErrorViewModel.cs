@@ -1,6 +1,6 @@
 using System;
 
-namespace CSL.Web.Models
+namespace PressMon.Web.Models
 {
     public class ErrorViewModel
     {

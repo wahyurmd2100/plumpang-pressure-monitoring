@@ -6,16 +6,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using CSL.Web.Data;
-using CSL.Web.Models;
-using CSL.Web.Areas.Identity.Data;
+using PressMon.Web.Data;
+using PressMon.Web.Models;
+using PressMon.Web.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace CSL.Web.Controllers
+namespace PressMon.Web.Controllers
 {
     public class AppUsersController : Controller
     {

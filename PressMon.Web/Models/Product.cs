@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 
-namespace CSL.Web.Models
+namespace PressMon.Web.Models
 {
     public class Product
     {

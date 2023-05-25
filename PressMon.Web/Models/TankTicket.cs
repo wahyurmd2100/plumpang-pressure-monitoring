@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
-//using CSL.Web.Models;
 //using System.ComponentModel.DataAnnotations.Schema;
 //using System.ComponentModel;
 
-namespace CSL.Web.Models
+namespace PressMon.Web.Models
 {
     public class TankTicket
     {

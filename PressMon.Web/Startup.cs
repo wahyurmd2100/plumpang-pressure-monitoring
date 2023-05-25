@@ -8,13 +8,13 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CSL.Web.Areas.Identity.Data;
-using CSL.Web.Data;
+using PressMon.Web.Areas.Identity.Data;
+using PressMon.Web.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 
-namespace CSL.Web
+namespace PressMon.Web
 {
     public class Startup
     {

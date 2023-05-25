@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using CSL.Web.Models;
+using PressMon.Web.Models;
 
-namespace CSL.Web.Areas.Identity.Data
+namespace PressMon.Web.Areas.Identity.Data
 {
     // Add profile data for application users by adding properties to the AppUser class
     public class AppUser : IdentityUser // ini inheritence namanya man. kalau rule buat lagi modelnya pakai inheritence

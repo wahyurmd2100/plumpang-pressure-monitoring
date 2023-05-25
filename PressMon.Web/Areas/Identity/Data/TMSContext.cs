@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CSL.Web.Areas.Identity.Data;
+using PressMon.Web.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using CSL.Web.Models;
+using PressMon.Web.Models;
 using PressMon.Web.Models;
 
-namespace CSL.Web.Data
+namespace PressMon.Web.Data
 {
     public class TMSContext : IdentityDbContext<AppUser>
     {

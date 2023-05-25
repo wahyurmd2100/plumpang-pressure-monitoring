@@ -1,16 +1,16 @@
-﻿using CSL.Web.Models;
+﻿using PressMon.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using CSL.Web.Data;
+using PressMon.Web.Data;
 using PressMon.Web.Models;
 using System.Collections.Generic;
 using System;
 
-namespace CSL.Web.Controllers
+namespace PressMon.Web.Controllers
 {
     public class HomeController : Controller
     {

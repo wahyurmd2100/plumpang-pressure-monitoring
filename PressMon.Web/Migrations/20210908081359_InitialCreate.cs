@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace CSL.Web.Migrations
+namespace PressMon.Web.Migrations
 {
     public partial class InitialCreate : Migration
     {

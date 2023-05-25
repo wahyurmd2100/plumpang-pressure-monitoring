@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel;
 
-namespace PressMon.ATGService.Models
+namespace PressMon.Service.Models
 {
     public class TankLiveData
     {

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PressMon.ATGService.Models
+namespace PressMon.Service.Models
 {
     public class Tank
     {

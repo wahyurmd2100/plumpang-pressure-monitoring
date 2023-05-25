@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using PressMon.ATGService.Models;
+using PressMon.Service.Models;
 
-namespace PressMon.ATGService
+namespace PressMon.Service
 {
     public class DBHerper
     {

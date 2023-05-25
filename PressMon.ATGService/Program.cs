@@ -1,4 +1,4 @@
-using PressMon.ATGService;
+using PressMon.Service;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Configuration;
