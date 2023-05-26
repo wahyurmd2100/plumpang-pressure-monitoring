@@ -108,6 +108,151 @@
 
                 });
             }
+
+            //start current data
+            var pressCtx = document.getElementById('press').getContext('2d');
+            var gaugeViewCtx = document.getElementById('gaugeView').getContext('2d');
+
+            var dataValue = ((Math.random() * 9) + 1).toFixed(2);
+
+            var press = new Chart(pressCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Current Pressure'],
+                    datasets: [{
+                        data: [dataValue, 10-dataValue],
+                        backgroundColor: ['#36b9cc', 'rgba(0, 0, 0, 0)'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutoutPercentage: 70, // Adjust this value to control the size of the center hole
+                    legend: {
+                        display: false
+                    },
+                    tooltips: {
+                        enabled: false
+                    },
+                    rotation: -Math.PI, // Rotates the chart to make it a half-circle
+                    circumference: Math.PI, // Sets the circumference to make it a half-circle
+                    animation: {
+                        animateRotate: true,
+                        animateScale: false,
+                        onComplete: function () {
+                            var chart = this.chart;
+                            var valueText = dataValue
+                            var unitText = 'psi';
+
+                            var width = chart.chart.width;
+                            var height = chart.chart.height;
+                            var ctx = chart.chart.ctx;
+
+                            ctx.restore();
+                            var valueFontSize = (height / 3).toFixed(2); // Adjust the divisor to increase or decrease the font size of the value
+                            var unitFontSize = (height / 6).toFixed(2); // Adjust the divisor to increase or decrease the font size of the unit
+
+                            ctx.font = "bold " + valueFontSize + "px Arial"; // Set the font style and size for the value
+                            ctx.textBaseline = "middle";
+                            ctx.fillStyle = "#36b9cc"; // Set the text color for the value
+
+                            ctx.textAlign = 'center';
+                            ctx.fillText(valueText, width / 2, height / 1.6); // Adjust the vertical position of the value
+
+                            ctx.font = unitFontSize + "px Arial"; // Set the font style and size for the unit
+                            ctx.fillStyle = "#6c757d"; // Set the text color for the unit
+
+                            ctx.fillText(unitText, width / 2, height / 1.2); // Adjust the vertical position of the unit
+                            ctx.save();
+
+                        }
+                    }
+                }
+            });
+
+
+            var gaugeView = new Chart(gaugeViewCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['LL', 'L', 'N' ,'H', 'HH'],
+                    datasets: [{
+                        data: [1, 1, 6, 1, 1],
+                        backgroundColor: ['#212529', '#6c757d', '#36b9cc', '#ffc107', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutoutPercentage: 95, // Adjust this value to control the size of the center hole and the thickness of the overlay
+                    legend: {
+                        display: false
+                    },
+                    tooltips: {
+                        enabled: false
+                    },
+                    hover: {
+                        mode: null // Disable hover effect
+                    },
+                    rotation: -Math.PI, // Rotates the chart to make it a half-circle
+                    circumference: Math.PI, // Sets the circumference to make it a half-circle
+                    animation: {
+                        animateRotate: false, // Disable rotation animation
+                        animateScale: false, // Disable scaling animation
+                    }
+                }
+            });
+            //end current data
+
+            //start data visualization
+            var tableRows = document.querySelectorAll(".table tbody tr"); // Get the table rows
+
+            // Extract data from table rows
+            var dataLabels = [];
+            var dataValues = [];
+            for (var i = 0; i < tableRows.length; i++) {
+                var row = tableRows[i];
+                var cells = row.getElementsByTagName("td");
+                var value = parseFloat(cells[0].textContent);
+                if (!isNaN(value)) { // Skip null or empty values
+                    dataValues.push(value);
+                    dataLabels.push(cells[1].textContent);
+                }
+            }
+
+            // Create the line chart
+            var ctx = document.getElementById('dataVisualization').getContext('2d');
+            var dataVisualization = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dataLabels,
+                    datasets: [{
+                        label: 'Pressure Value',
+                        data: dataValues,
+                        borderColor: '#36b9cc',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Timestamp'
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Pressure Value'
+                            }
+                        }]
+                    }
+                }
+            });
+            //end data visualization
+
+
         </script>
     }
 
@@ -124,118 +269,65 @@
         </a>
     </div>
 
-    <!-- Tank Monitoring -->
-    <div class="row">
-        @{
-            var tanks = ViewBag.Tanks;
-        }
-        @foreach (var tank in tanks)
-        {
-            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-1 mb-3">
-                <div class="card shadow bg-white rounded">
-                    <img src="~/assets/img/tank-mini2.webp" class="card-img-top p-2" style="border-bottom:5px solid @tank.HexColor;" alt="tank-picture">
-
-                    <div class="card-img-overlay mt-5 mb-5 mr-3">
-                        <div class="caption text-center">
-                            @*<p class="card-text text-info" id="@tank.TankId">Initializing...</p>*@
-                            <p class="card-title font-weight-bolder text-lg mb-0" style="color:rgba(0,0,0,0.6);">@tank.Name</p>
-                            <p class="card-text font-weight-bolder mb-0" style="color:rgba(0,0,0,0.6);" id="@tank.TankId">Initializing...</p>
-                        </div>
+    <!-- Dashboard -->
+    <div class="row g-2">
+        <div class="col-4">
+            <div class="card h-100 d-flex flex-column">
+                <div class="card-body">
+                    <h5 class="card-title">Pressure (Psi)</h5>
+                    <div style="position:relative">
+                        <canvas id="press"></canvas>
+                        <canvas id="gaugeView" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></canvas>
                     </div>
-                
-                    <div class="card-body py-2 px-3">
-                        @*<p class="card-title font-weight-bold mb-0" style="color:@tank.HexColor;">@tank.Name</p>*@
-                        <small class="card-title" style="color:@tank.HexColor;">@tank.ProductName</small>
-                        @*<p class="card-text" id="@tank.TankId">Initializing...</p>*@
-                    </div>
-
-                    <button type="button" class="card-footer btn btn-info bg-info" onclick="OpenModal(this);" value="@tank.TankId" style="width: 100%;">
-                        @*<i class="fas fa-info-circle mr-2"></i>*@ @tank.Name Details @*<i class="fas fa-angle-right fa-2xs"></i>*@ @*<i class="fas fa-arrow-right fa-2xs"></i>*@
-                    </button>
                 </div>
-            </div>            
-        }
-    </div>
-</div>
-
-
-@* ---------------------- Modal Detail Tank ---------------------- *@
-
-<div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="viewModalLabel"><b>Tank Level Details</b></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
             </div>
-
-            <div class="modal-body">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <img class="img-fluid p-0" src="~/assets/img/tank-mini2.webp" />
-                            <p class="text-left mb-0">Percentage Tank Level</p>
-                            <div class="progress" style="height: 20px;">
-                                <div id="progLevel" class="progress-bar bg-warning" role="progressbar" style="width: 100%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="text-left mb-0">Percentage Tank Volume</p>
-                            <div class="progress" style="height: 20px;">
-                                <div id="progVolume" class="progress-bar bg-danger" role="progressbar" style="width: 100%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table table-borderless table-sm">
-                                <tbody>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Name</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td id="tbName" style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Product</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td id="tbProduct" style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Timestamp</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td id="tbTimeStamp" style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;"> Level (mm)</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td id="tbLevel" style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Temperature (&deg;C)</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td id="tbTemp" style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Density (gr/m&sup3;)</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td id="tbDensity" style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Gross Volume (L)</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td id="tbGrossVolume" style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" style="padding: 8px;">Net Volume (L)</th>
-                                        <td style="padding: 8px;"> : </td>
-                                        <td id="tbNetVolume" style="padding: 8px;">&tilde;</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+        </div>
+        <div class="col-8">
+            <div class="card h-100 d-flex flex-column">
+                <div class="card-body">
+                    <h5 class="card-title">Last Record Data</h5>
+                    <div class="table-responsive">
+                        <table id="tb-tanklivedata" class="table table-sm table-striped table-bordered dt-responsive nowrap text-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="fw-bold">Pressure Value</th>
+                                    <th class="fw-bold">Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>3.14</td>
+                                    <td>2023-05-25 10:15:22</td>
+                                </tr>
+                                <tr>
+                                    <td>2.76</td>
+                                    <td>2023-05-25 11:20:10</td>
+                                </tr>
+                                <tr>
+                                    <td>4.82</td>
+                                    <td>2023-05-25 12:35:45</td>
+                                </tr>
+                                <tr>
+                                    <td>1.97</td>
+                                    <td>2023-05-25 13:45:30</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
+
+    <div class="row my-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Data Visualization</h5>
+                    <canvas id="dataVisualization"></canvas>
+                </div>
             </div>
         </div>
     </div>
 </div>
-@* ---------------------- End Modal Detail Tank ---------------------- *@
