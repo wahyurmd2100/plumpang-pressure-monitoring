@@ -11,10 +11,42 @@
     <title>CSL - @ViewData["Title"]</title>
     <partial name="_Styles" />
     @RenderSection("Styles", required: false)
-
 </head>
+
+
 <!-- Page Wrapper -->
 <body id="page-top">
+    <script>
+        window.addEventListener("load", function () {
+            var blinkingText = document.getElementById("blinkingText");
+            var visibleDuration = 1000; // Duration in milliseconds for the visible state
+            var hiddenDuration = 500; // Duration in milliseconds for the hidden state
+
+            function blinkText() {
+                if (blinkingText.style.visibility === "" || blinkingText.style.visibility === "visible") {
+                    blinkingText.style.visibility = "hidden";
+                    setTimeout(function () {
+                        blinkingText.style.visibility = "visible";
+                    }, hiddenDuration);
+                } else {
+                    blinkingText.style.visibility = "visible";
+                    setTimeout(function () {
+                        blinkingText.style.visibility = "hidden";
+                    }, visibleDuration);
+                }
+            }
+
+            function handleClick() {
+                blinkingText.style.display = "none";
+            }
+
+            setInterval(blinkText, visibleDuration + hiddenDuration);
+
+            blinkingText.addEventListener("click", handleClick);
+        });
+
+    </script>
+
     <!-- Page Wrapper -->
     <div id="wrapper">
         <!-- Sidebar -->
@@ -35,13 +67,21 @@
             <li class="nav-item active">
                 <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="fas fa-home"></i>
-                    @*<i class="fas fa-fw fa-tachometer-alt"></i>*@
                     <span>Home</span>
                 </a>
-                <a class="nav-link" asp-area="" asp-controller="TankLiveDatas" asp-action="Index">
+                @*<a class="nav-link" asp-area="" asp-controller="TankLiveDatas" asp-action="Index">
                     <i class="fas fa-table"></i>
-                    @*<i class="fas fa-fw fa-tachometer-alt"></i>*@
                     <span>Live Data</span>
+                </a>*@
+                <a class="nav-link" asp-area="" asp-controller="" asp-action="">
+                    <i class="fas fa-history"></i>
+                    @*<i class="fas fa-fw fa-tachometer-alt"></i>*@
+                    <span>Historical</span>
+                </a>
+                <a class="nav-link" asp-area="" asp-controller="" asp-action="">
+                    <i class="fas fa-bell fa-fw"></i>
+                    @*<i class="fas fa-fw fa-tachometer-alt"></i>*@
+                    <span>Alarms Log</span>
                 </a>
             </li>
 
@@ -106,33 +146,16 @@
             <!-- Nav Item - Administration Collapse Menu -->
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
-                    <i class="fas fa-users-cog"></i>
-                    <span>Administration</span>
+                    <i class="fas fa-cogs"></i>
+                    <span>Configuration</span>
                 </a>
                 <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Production:</h6>
-                        <a class="collapse-item" asp-area="" asp-controller="Products" asp-action="Index">
-                            <i class="fas fa-tint"></i>
-                            Products
+                        <h6 class="collapse-header">Settings :</h6>
+                        <a class="collapse-item" asp-area="" asp-controller="" asp-action="">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Alarm Set Point</span>
                         </a>
-                        <a class="collapse-item" asp-area="" asp-controller="Tanks" asp-action="Index">
-                            <i class="fas fa-prescription-bottle"></i>
-                            Tank List
-                        </a>
-                        <h6 class="collapse-header">Configuration:</h6>
-                        <a class="collapse-item" asp-area="" asp-controller="AppUsers" asp-action="Index">
-                            <i class="fas fa-users"></i>
-                            User List
-                        </a>
-                        <a class="collapse-item" asp-area="" asp-controller="Roles" asp-action="Index">
-                            <i class="fas fa-user-tag"></i>
-                            User Role
-                        </a>
-                        @*<a class="collapse-item" asp-area="" asp-controller="WebService" asp-action="Index">
-                            <i class="fas fa-cogs"></i>
-                            Web Service
-                        </a>*@
                     </div>
                 </div>
             </li>
@@ -158,10 +181,10 @@
         <!-- End Sidebar -->
 
 
-        @*//Main content*@
+        
         <div class="content-wrapper" style="width: 100%;">
             <!-- Topbar -->
-            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-3 static-top shadow">
 
                 <!-- Sidebar Toggle (Topbar) -->
                 <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
@@ -169,10 +192,29 @@
                 </button>
 
                 <!-- Topbar Title -->
-                <p class="navbar-item mt-3 font-weight-normal" style="font-size: 1.25vw; height: auto;">
-                    PT. REDECO PETROLIN UTAMA
-                </p>
+                <ul class="navbar-nav">
+                    <li class="nav-item mt-1">
+                        Alarm
+                    </li>
+                    <div class="topbar-divider d-none d-sm-block"></div>
+                    <li class="nav-item">
+                        <span class="btn btn-danger px-3 py-1 cursor-pointer" id="blinkingText">
+                            Pressure : <b>9.98 Bar</b>
+                        </span>
+                    </li>
+                </ul>
+
+                @*<p class="navbar-item mt-3 font-weight-normal" style="font-size: 1.25vw; height: auto;">
+                    <span class="border-end mr-3">
+                        Alarm
+                    </span>
+                    
+                    <span class="rounded-pill bg-danger text-white px-3 py-1" id="blinkingText">
+                        Pressure : <b>9.98 Bar</b>
+                    </span>
+                </p>*@
                 <!-- End Topbar Title -->
+
                 <!-- Topbar Navbar -->
                 <ul class="navbar-nav ml-auto">
 
@@ -192,38 +234,53 @@
                             </h6>
                             <a class="dropdown-item d-flex align-items-center" href="#">
                                 <div class="mr-3">
-                                    <div class="icon-circle bg-primary">
-                                        <i class="fas fa-file-alt text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="small text-gray-500">December 12, 2019</div>
-                                    <span class="font-weight-bold">A new monthly report is ready to download!</span>
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-success">
-                                        <i class="fas fa-donate text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="small text-gray-500">December 7, 2019</div>
-                                    $290.29 has been deposited into your account!
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-warning">
+                                    <div class="icon-circle bg-danger">
                                         <i class="fas fa-exclamation-triangle text-white"></i>
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="small text-gray-500">December 2, 2019</div>
-                                    Spending Alert: We've noticed unusually high spending for your account.
+                                    <div class="small text-gray-500">2023/05/28 15:07:22</div>
+                                    Pressure over HH limit, <br /> 
+                                    Pressure : <b>9.98 Bar</b>
                                 </div>
                             </a>
-                            <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                <div class="mr-3">
+                                    <div class="icon-circle bg-danger">
+                                        <i class="fas fa-exclamation-triangle text-white"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="small text-gray-500">2023/05/28 15:07:22</div>
+                                    Pressure below LL limit, <br />
+                                    Pressure : <b>1.01 Bar</b>
+                                </div>
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                <div class="mr-3">
+                                    <div class="icon-circle bg-danger">
+                                        <i class="fas fa-exclamation-triangle text-white"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="small text-gray-500">2023/05/28 15:07:22</div>
+                                    Pressure over H limit, <br />
+                                    Pressure : <b>8.11 Bar</b>
+                                </div>
+                            </a>
+                            <a class="dropdown-item d-flex align-items-center" href="#">
+                                <div class="mr-3">
+                                    <div class="icon-circle bg-danger">
+                                        <i class="fas fa-exclamation-triangle text-white"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="small text-gray-500">2023/05/28 15:07:22</div>
+                                    Pressure below L limit, <br />
+                                    Pressure : <b>2.07 Bar</b>
+                                </div>
+                            </a>
+                            <a class="dropdown-item text-center small text-gray-500" href="#">Show Alarms Log</a>
                         </div>
                     </li>
 
