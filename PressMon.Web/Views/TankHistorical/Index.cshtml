@@ -112,51 +112,42 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Historical</h1>
         <a value="reload" onclick="reloadTable()" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
-            <i class="fas fa-redo-alt"></i>
+            <i class="fas fa-redo-alt fa-2xs"></i>
         </a>
     </div>
 
     <!-- Submain Content -->
     <div class="card shadow-lg rounded">
         <div class="card-body">
-            <!-- Tank Filter -->
+            <h5 class="card-title">Filter</h5>
             <form>
                 <div class="form-row">
-                    <div class="col col-md-3">
-                        <div class="input-group mb-3">
+                    <div class="col col-md-2">
+                        <div class="input-group input-group-sm">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="min-date">Date From</span>
+                                <span class="input-group-text" id="min-date ">From</span>
                             </div>
                             <input onchange="reloadTable();" type="text" name="min-date" id="min" class="form-control" placeholder="Start From" aria-label="Min-Date" aria-describedby="min-date" value="@DateTime.Now.ToString("dd MMMM yyyy")">
                         </div>
                     </div>
-                    <div class="col col-md-3">
-                        <div class="input-group mb-3">
+                    <div class="col col-md-2">
+                        <div class="input-group input-group-sm">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="max-date">Date To</span>
+                                <span class="input-group-text" id="max-date">To</span>
                             </div>
                             <input onchange="reloadTable();" type="text" name="max-date" id="max" class="form-control" placeholder="Until" aria-label="Max-date" aria-describedby="max-date" value="@DateTime.Now.ToString("dd MMMM yyyy")">
                         </div>
                     </div>
-                    <div class="col col-md-3">
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="tank">Tank</label>
-                            </div>
-                            <select id="tank-name" onchange="reloadTable();" class="custom-select" id="tank" asp-items=@(new SelectList(ViewBag.TankId,"TankId","Name"))>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col col-md-3">
-                        <div class="input-group">
-                            <button type="reset" class="btn btn-warning" style="width: 100%;" onclick="reset();"><i class="fas fa-undo-alt"></i> Reset Filter</button>
+                    <div class="col col-md-2">
+                        <div class="input-group input-group-sm">
+                            <button type="reset" class="btn btn-warning btn-sm" onclick="reset();"><i class="fas fa-undo-alt"></i> Reset Filter</button>
                         </div>
                     </div>
                 </div>
             </form>
-            <!-- End Tank Filter -->
             <!-- Divider -->
             <hr class="sidebar-divider my-3">
+            @*<h5 class="card-title">Historical Table View</h5>*@
             <!-- Tank Table -->
             @*@await Html.PartialAsync("_ViewAll", Model)*@
             <table id="tb-tanklivedata" class="table table-sm table-striped table-bordered dt-responsive nowrap text-sm table-hover mb-0">
