@@ -21,6 +21,7 @@
             var blinkingText = document.getElementById("blinkingText");
             var visibleDuration = 1000; // Duration in milliseconds for the visible state
             var hiddenDuration = 500; // Duration in milliseconds for the hidden state
+            var blinkInterval; // Variable to store the interval ID
 
             function blinkText() {
                 if (blinkingText.style.visibility === "" || blinkingText.style.visibility === "visible") {
@@ -40,9 +41,22 @@
                 blinkingText.style.display = "none";
             }
 
-            setInterval(blinkText, visibleDuration + hiddenDuration);
+            function handleMouseEnter() {
+                clearInterval(blinkInterval); // Clear the blinking interval
+                blinkingText.style.visibility = "visible";
+            }
+
+            function handleMouseLeave() {
+                clearInterval(blinkInterval); // Clear the blinking interval
+                blinkingText.style.visibility = "hidden";
+                blinkInterval = setInterval(blinkText, visibleDuration + hiddenDuration); // Start the blinking interval from hidden state
+            }
+
+            blinkInterval = setInterval(blinkText, visibleDuration + hiddenDuration); // Start the initial blinking interval
 
             blinkingText.addEventListener("click", handleClick);
+            blinkingText.addEventListener("mouseenter", handleMouseEnter);
+            blinkingText.addEventListener("mouseleave", handleMouseLeave);
         });
 
     </script>
@@ -65,19 +79,21 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
-                <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">
+                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="fas fa-home"></i>
                     <span>Home</span>
                 </a>
-                @*<a class="nav-link" asp-area="" asp-controller="TankLiveDatas" asp-action="Index">
-                    <i class="fas fa-table"></i>
-                    <span>Live Data</span>
-                </a>*@
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link" asp-area="" asp-controller="" asp-action="">
                     <i class="fas fa-history"></i>
                     @*<i class="fas fa-fw fa-tachometer-alt"></i>*@
                     <span>Historical</span>
                 </a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link" asp-area="" asp-controller="" asp-action="">
                     <i class="fas fa-bell fa-fw"></i>
                     @*<i class="fas fa-fw fa-tachometer-alt"></i>*@
@@ -194,11 +210,14 @@
                 <!-- Topbar Title -->
                 <ul class="navbar-nav">
                     <li class="nav-item mt-1">
-                        Alarm
+                        <span class="">
+                            Alarm
+                        </span>
+                        
                     </li>
                     <div class="topbar-divider d-none d-sm-block"></div>
-                    <li class="nav-item">
-                        <span class="btn btn-danger px-3 py-1 cursor-pointer" id="blinkingText">
+                    <li class="nav-item mt-1">
+                        <span class="btn btn-danger btn-sm px-3 py-1 cursor-pointer" id="blinkingText">
                             Pressure : <b>9.98 Bar</b>
                         </span>
                     </li>

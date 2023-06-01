@@ -110,7 +110,7 @@
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Tank Historical</h1>
+        <h1 class="h3 mb-0 text-gray-800">Historical</h1>
         <a value="reload" onclick="reloadTable()" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
             <i class="fas fa-redo-alt"></i>
         </a>
@@ -118,7 +118,6 @@
 
     <!-- Submain Content -->
     <div class="card shadow-lg rounded">
-        <div class="card-header bg-gradient-info"></div>
         <div class="card-body">
             <!-- Tank Filter -->
             <form>
@@ -159,7 +158,33 @@
             <!-- Divider -->
             <hr class="sidebar-divider my-3">
             <!-- Tank Table -->
-            @await Html.PartialAsync("_ViewAll", Model)
+            @*@await Html.PartialAsync("_ViewAll", Model)*@
+            <table id="tb-tanklivedata" class="table table-sm table-striped table-bordered dt-responsive nowrap text-sm table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="fw-bold">Pressure Value</th>
+                        <th class="fw-bold">Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>3.14</td>
+                        <td>2023-05-25 10:15:22</td>
+                    </tr>
+                    <tr>
+                        <td>2.76</td>
+                        <td>2023-05-25 11:20:10</td>
+                    </tr>
+                    <tr>
+                        <td>4.82</td>
+                        <td>2023-05-25 12:35:45</td>
+                    </tr>
+                    <tr>
+                        <td>1.97</td>
+                        <td>2023-05-25 13:45:30</td>
+                    </tr>
+                </tbody>
+            </table>
             <!-- End Tank table -->
         </div>
     </div>
