@@ -39,7 +39,7 @@ namespace TMS.Web.Apis
                 historical.TimeStamp = Convert.ToInt32(DateTimeOffset.Now.ToUnixTimeSeconds());
                 _context.Add(historical);
                 await _context.SaveChangesAsync();
-                await _hubContext.Clients.All.SendAsync("ReceiveData", data);
+                await _hubContext.Clients.All.SendAsync("ReceiveData", data);//signal R PUBLISH
                 return Ok(new { Success = true, Message = "Update Success" });
             }
             return Ok(new { Success = false, Message = "Update Failed" });
