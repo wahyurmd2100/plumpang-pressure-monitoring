@@ -6,7 +6,7 @@ namespace TMS.Web.Apis
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LiveData : ControllerBase
+    public class LiveDataController : ControllerBase
     {
     }
 }

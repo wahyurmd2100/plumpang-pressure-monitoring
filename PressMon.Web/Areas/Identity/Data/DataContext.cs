@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PressMon.Web.Models;
 using PressMon.Web.Models;
+using TMS.Web.Apis;
+using TMS.Web.Models;
 
 namespace PressMon.Web.Data
 {
@@ -17,8 +19,10 @@ namespace PressMon.Web.Data
         {        
         }
 
+        public DbSet<LiveData> LiveDatas { get; set; }
+        public DbSet<Alarm> Alarms { get; set; }
+        public DbSet<Historical> Historicals { get; set; }
 
-   
 
     }
 }
