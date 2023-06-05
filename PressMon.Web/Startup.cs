@@ -12,6 +12,7 @@ using PressMon.Web.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
+using TMS.Web.Hubs;
 
 namespace PressMon.Web
 {
@@ -30,6 +31,7 @@ namespace PressMon.Web
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("ContextConnection")));
             services.AddControllersWithViews();
+            services.AddSignalR();
    
         }
 
@@ -50,6 +52,7 @@ namespace PressMon.Web
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<HomeHub>("/homehub");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");

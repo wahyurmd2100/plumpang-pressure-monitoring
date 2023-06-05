@@ -5,109 +5,18 @@
 
 <head>
     @section Scripts{
+        <script src="~/microsoft/signalr/dist/browser/signalr.min.js"></script>
         <script type="text/javascript">
             var intervalModalShow;
             var intervalHomeLoad;
             var TankId;
-            $(document).ready(function () {
-                jQuery.noConflict();
-                setInterval(realTimeData, 1000);
-                $("#viewModal").on('show.bs.modal', function () {
-                    intervalModalShow = setInterval(realTimeDataPopUp, 1000);
-                });
-                $('#viewModal').on('hidden.bs.modal', function () {
-                    clearInterval(intervalModalShow);
-                });
+            //signal R
+            var connection = new signalR.HubConnectionBuilder().withUrl("/homehub").build();
+            connection.on("ReceiveData", function (result) {
+                // update dashboard with new data
+                console.log(result); //tampilkan data ini di gauge pressure
             });
-            //end document
-            function setDatatoTank(tankData) {
-                let tankLevel = tankData.level;
-                let tankLevelFixed = tankLevel.toFixed(2);
-                document.getElementById(tankData.tankId).innerHTML = tankLevelFixed.toString() + " mm";
-            }
-
-            function realTimeData() {
-                //console.log(TankId);
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetData")",
-                    dataType: "json",
-                    success: function (result) {
-                        //var data = JSON.stringify(result);
-                        //console.log(data);
-                        for (tnk in result) {
-                            setDatatoTank(result[tnk]);
-                        }
-
-                    },
-                    error: function (err) {
-                        console.log(err);
-                    }
-
-                });
-            }
-            function realTimeDataPopUp() {
-                var Id = {
-                    Id : TankId
-                };
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetDataByTankId")",
-                    dataType: "json",
-                    data: Id,
-                    success: function (result) {
-                        var persenLevel = result.persLevel;
-                        var persenVolume = result.persVolume;
-                        //progress bar level
-                        let progressBarLevel = document.getElementById("progLevel");
-                        progressBarLevel.style.width = persenLevel.toString() + "%";
-                        progressBarLevel.setAttribute("aria-valuenow", persenLevel);
-                        //progress bar volume
-                        let progressBarVolume = document.getElementById("progVolume");
-                        progressBarVolume.style.width = persenVolume.toString() + "%";
-                        progressBarVolume.setAttribute("aria-valuenow", persenVolume);
-                        //set table table 
-                        $("#tbName").text(result.name);
-                        $("#tbProduct").text(result.productName);
-                        $("#tbTimeStamp").text(result.timeStamp);
-                        $("#tbLevel").text(result.level.toFixed(2));
-                        $("#tbTemp").text(result.temperature.toFixed(2));
-                        $("#tbDensity").text(result.density.toFixed(2));
-                        $("#tbGrossVolume").text(result.grossVolume.toFixed(2));
-                        $("#tbNetVolume").text(result.netVolume.toFixed(2));
-                    },
-                    error: function (err) {
-                        console.log(err);
-                    }
-
-                });
-            }
-            function OpenModal(data)
-            {
-                var value = data.value;
-                console.log("Modal Open");
-                TankId = value;
-                jQuery.noConflict();
-                $("#viewModal").modal();
-                $("#viewModal").modal('show');
-            }
-
-            function getRow()
-            {
-                 $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("GetRow")",
-                    dataType: "json",
-                     success: function (result) {
-                         console.log(result);
-
-                    },
-                    error: function (err) {
-                        console.log(err);
-                    }
-
-                });
-            }
+            connection.start();
 
             //start current data
             var pressCtx = document.getElementById('press').getContext('2d');
@@ -120,7 +29,7 @@
                 data: {
                     labels: ['Current Pressure'],
                     datasets: [{
-                        data: [dataValue, 10-dataValue],
+                        data: [dataValue, 10 - dataValue],
                         backgroundColor: ['#36b9cc', 'rgba(0, 0, 0, 0)'],
                     }]
                 },
@@ -173,7 +82,7 @@
             var gaugeView = new Chart(gaugeViewCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['LL', 'L', 'N' ,'H', 'HH'],
+                    labels: ['LL', 'L', 'N', 'H', 'HH'],
                     datasets: [{
                         data: [1, 1, 6, 1, 1],
                         backgroundColor: ['#212529', '#6c757d', '#36b9cc', '#ffc107', '#dc3545']
