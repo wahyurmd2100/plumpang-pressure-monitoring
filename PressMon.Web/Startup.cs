@@ -8,7 +8,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PressMon.Web.Areas.Identity.Data;
 using PressMon.Web.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -28,32 +27,10 @@ namespace PressMon.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<TMSContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("CTMWebContextConnection")));
-
-            services.AddIdentity<AppUser, IdentityRole>(options =>
-            {
-                options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireDigit = false;
-                options.SignIn.RequireConfirmedAccount = false;
-            }).AddEntityFrameworkStores<TMSContext>()
-            .AddDefaultUI()
-            .AddRoleManager<RoleManager<IdentityRole>>()
-            .AddDefaultTokenProviders();
-
+        //    services.AddDbContext<DataContext>(options =>
+        //        options.UseSqlServer(Configuration.GetConnectionString("CTMWebContextConnection")));
             services.AddControllersWithViews();
-            services.AddRazorPages(options => {
-                options.Conventions.AllowAnonymousToPage("/Identity/Account/Login");
-                options.Conventions.AllowAnonymousToPage("/Identity/Account/Logout");
-            });
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-                options.LoginPath = "/Identity/Account/Login";
-                options.LogoutPath = "/Identity/Account/Logout";
-                options.AccessDeniedPath = "/Identity/Account/Login";
-            });
+   
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,15 +47,12 @@ namespace PressMon.Web
             app.UseStaticFiles();
 
             app.UseRouting();
-            app.UseAuthentication(); //to be added
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapRazorPages(); //to be added
             });
         }
     }
