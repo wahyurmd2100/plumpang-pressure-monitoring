@@ -11,8 +11,9 @@ using TMS.Web.Models;
 
 namespace TMS.Web.Apis
 {
+
     [ApiController]
-    [Route("api/[controller]")]    
+    [Route("api/[controller]")]
     public class LiveDataController : ControllerBase
     {
         private readonly IHubContext<HomeHub> _hubContext;
@@ -50,4 +51,5 @@ namespace TMS.Web.Apis
         public string LocationName { get; set; }
         public double Pressure { get; set; }
     }
+
 }
