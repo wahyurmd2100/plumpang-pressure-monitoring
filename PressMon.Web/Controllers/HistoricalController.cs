@@ -25,8 +25,6 @@ namespace TMS.Web.Controllers
                 var draw = HttpContext.Request.Form["draw"].FirstOrDefault();
                 var start = Request.Form["start"].FirstOrDefault();// Skip number of Rows count  
                 var length = Request.Form["length"].FirstOrDefault(); // Paging Length 10,20  
-                var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault(); // Sort Column Name  
-                var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();// Sort Column Direction (asc, desc)  
                 var searchValue = Request.Form["search[value]"].FirstOrDefault(); // Search Value from (Search box)  
                 int pageSize = length != null ? Convert.ToInt32(length) : 0; //Paging Size (10, 20, 50,100)  
                 int skip = start != null ? Convert.ToInt32(start) : 0;
@@ -39,13 +37,9 @@ namespace TMS.Web.Controllers
                     p.LocationName,
                     p.Pressure,
                     TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
-                });
+                }).OrderBy(t=>t.HistoricalID).Reverse();
 
-                ////Sorting  
-                if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
-                {
-                    historicals = historicals.OrderBy(sortColumn + " " + sortColumnDirection);
-                }
+                
 
                 //total number of rows counts   
                 recordsTotal = historicals.Count();
