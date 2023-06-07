@@ -48,7 +48,7 @@
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Alarms</h1>
+        <h1 class="h3 mb-0 text-gray-800">Alarm</h1>
         <a value="reload" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
             <i class="fas fa-redo-alt"></i>
         </a>
@@ -56,7 +56,10 @@
 
     <!-- Submain Content -->
     <div class="card shadow-lg rounded" style="font-size:12px;">
+        <div class="card-header bg-gradient-info"></div>
         <div class="card-body">
+            <!-- Divider -->
+            <hr class="sidebar-divider my-3">
 
             <!-- Tank Table -->
             @await Html.PartialAsync("_ViewAll", Model)
