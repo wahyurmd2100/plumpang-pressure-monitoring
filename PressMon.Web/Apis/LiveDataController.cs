@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TMS.Web.Hubs;
 using TMS.Web.Models;
+using static TMS.Web.Apis.LiveDataController;
 
 namespace TMS.Web.Apis
 {
@@ -18,11 +19,24 @@ namespace TMS.Web.Apis
     {
         private readonly IHubContext<HomeHub> _hubContext;
         private readonly DataContext _context;
+        //
+        private enum Alarm_val : int
+        {
+            LL = 10,
+            L = 20,
+            H = 30,
+            HH = 40
+        }
         public LiveDataController(IHubContext<HomeHub> hubContext, DataContext context)
         {
             _hubContext = hubContext;
             _context = context;
         }
+        /// <summary>
+        /// PostData - DataPost
+        /// </summary>
+        /// <param name="dataPost"></param>
+        /// <returns></returns>
         [Route("~/api/PostData")]
         [HttpPost]
         public async Task<IActionResult> PostData([FromBody] DataPost dataPost)
@@ -33,6 +47,8 @@ namespace TMS.Web.Apis
                 data.Pressure = dataPost.Pressure;
                 data.TimeStamp = Convert.ToInt32(DateTimeOffset.Now.ToUnixTimeSeconds());
                 _context.Update(data);
+                //
+                SetAlarm(data);
                 //
                 Historical historical = new Historical();
                 historical.LocationName = data.LocationName;
@@ -45,7 +61,38 @@ namespace TMS.Web.Apis
             }
             return Ok(new { Success = false, Message = "Update Failed" });
         }
+        /// <summary>
+        /// Set Alarm
+        /// </summary>
+        /// <param name="liveData"></param>
+        private void SetAlarm(LiveData liveData)
+        {
+            Alarm alarm = null;
+            //
+            if(liveData.Pressure <= (double)Alarm_val.LL)
+            {
+                alarm = new Alarm { AlarmStatus = "LL", LocationName = liveData.LocationName, Pressure = liveData.Pressure, TimeStamp = liveData.TimeStamp };
+            }
+            else if (liveData.Pressure > (double)Alarm_val.LL && liveData.Pressure <=(double)Alarm_val.L)
+            {
+                alarm = new Alarm { AlarmStatus = "L", LocationName = liveData.LocationName, Pressure = liveData.Pressure, TimeStamp = liveData.TimeStamp };
+            }
+            else if (liveData.Pressure > (double)Alarm_val.H && liveData.Pressure <= (double)Alarm_val.HH)
+            {
+                alarm = new Alarm { AlarmStatus = "H", LocationName = liveData.LocationName, Pressure = liveData.Pressure, TimeStamp = liveData.TimeStamp };
+            }
+            else if (liveData.Pressure > (double)Alarm_val.HH)
+            {
+                alarm = new Alarm { AlarmStatus = "HH", LocationName = liveData.LocationName, Pressure = liveData.Pressure, TimeStamp = liveData.TimeStamp };
+            }
+            if(alarm != null)
+            {
+                _context.Add(alarm);
+            }
+        }
     }
+    //
+   
     public class DataPost
     {
         public string LocationName { get; set; }
