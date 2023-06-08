@@ -50,7 +50,7 @@
                         onComplete: function () {
                             var chart = this.chart;
                             var valueText = dataValue
-                            var unitText = 'psi';
+                            var unitText = 'Bar';
 
                             var width = chart.chart.width;
                             var height = chart.chart.height;
@@ -182,10 +182,11 @@
     <!-- Dashboard -->
     <div class="row g-2">
         <div class="col-4">
-            <div class="card shadow-lg rounded">
+            <div class="card h-100 d-flex flex-column shadow-lg rounded">
+                <div class="card-header bg-gradient-info p-1"></div>
                 <div class="card-body">
-                    <h5 class="card-title">Pressure (Psi)</h5>
-                    <div style="position:relative">
+                    <h5 class="card-title">Pressure (Bar)</h5>
+                    <div class="my-auto" style="position:relative">
                         <canvas id="press"></canvas>
                         <canvas id="gaugeView" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></canvas>
                     </div>
@@ -194,8 +195,13 @@
         </div>
         <div class="col-8">
             <div class="card shadow-lg rounded h-100">
+                <div class="card-header bg-gradient-info p-1"></div>
                 <div class="card-body">
-                    <h5 class="card-title">Last Record Data</h5>
+                    <h5 class="card-title">
+                        <a class="text-secondary" asp-area="" asp-controller="Historical" asp-action="Index">
+                            Last Record Data
+                        </a>
+                    </h5>
                     <div class="table-responsive">
                         <table id="tb-tanklivedata" class="table table-sm table-striped table-bordered dt-responsive nowrap text-sm table-hover mb-0">
                             <thead>
@@ -233,6 +239,7 @@
     <div class="row my-4">
         <div class="col-12">
             <div class="card shadow-lg" > 
+                <div class="card-header bg-gradient-info p-1"></div>
                 <div class="card-body">
                     <h5 class="card-title">Data Visualization</h5>
                     <div style="height: 500px">
