@@ -22,7 +22,7 @@ namespace PressMon.Web.Data
         public DbSet<LiveData> LiveDatas { get; set; }
         public DbSet<Alarm> Alarms { get; set; }
         public DbSet<Historical> Historicals { get; set; }
-
+        public DbSet<AlarmSettings> AlarmSettings { get; set; }
 
     }
 }
