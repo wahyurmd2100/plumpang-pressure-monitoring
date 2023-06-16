@@ -25,7 +25,7 @@
                         "scrollCollapse": true,
                         "paging": true,
                         "fixedColumns": true,
-                        "processing": true,
+                        "processing": false,
                         "ajax": {
                             "url": "@Url.Action("GetDataRecord","Home")",
                             "type": "POST",
@@ -166,6 +166,7 @@
                         dataType: 'json',
                         success: function (data) {
                             UpdatePressChartChart(data);
+                            oTable.ajax.reload(null, false);
                         },
                         error: function (error) {
                             console.log(error);
