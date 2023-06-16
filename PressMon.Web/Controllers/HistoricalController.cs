@@ -55,8 +55,7 @@ namespace TMS.Web.Controllers
         }
         private static string UnixTimeStampToDateTime(int unixTimeStamp)
         {
-            // Convert Unix timestamp to DateTimeOffset
-            
+            // Convert Unix timestamp to DateTimeOffset            
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds((long)unixTimeStamp);
             // Convert DateTimeOffset to desired datetime string format
             string datetimeString = dateTimeOffset.ToString("yyyy-MM-dd HH:mm:ss");

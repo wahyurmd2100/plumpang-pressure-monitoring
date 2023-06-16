@@ -46,6 +46,10 @@
       "provider": "unpkg",
       "library": "@microsoft/signalr@6.0.6",
       "destination": "wwwroot/microsoft/signalr/"
+    },
+    {
+      "library": "Chart.js@4.3.0",
+      "destination": "wwwroot/assets/Chart.js/"
     }
   ]
 }

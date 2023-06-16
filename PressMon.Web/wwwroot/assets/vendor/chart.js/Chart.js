@@ -1,3 +1,4 @@
+/// <reference path="../../chart.js/chart.min.js" />
 /*!
  * Chart.js v2.9.4
  * https://www.chartjs.org

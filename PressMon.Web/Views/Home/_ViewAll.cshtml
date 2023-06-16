@@ -1,0 +1,23 @@
+﻿@model TMS.Web.Models.Historical
+
+<div class="table-responsive">
+    <table id="tb-record" class="table table-sm table-striped table-bordered dt-responsive nowrap text-sm table-hover mb-0">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.HistoricalID)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.LocationName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Pressure)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TimeStamp)
+                </th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<!-- End Tank table -->

@@ -1,39 +1,60 @@
-﻿@{
+﻿@model TMS.Web.Models.Historical
+@{
     ViewData["Title"] = "Home Page";
     Layout = "~/Views/Shared/_LayoutNew.cshtml";
 }
 
 <head>
     @section Scripts{
-        <script src="~/microsoft/signalr/dist/browser/signalr.min.js"></script>
-        <script type="text/javascript">
-            var intervalModalShow;
-            var intervalHomeLoad;
-            var TankId;
-            //signal R
-            var connection = new signalR.HubConnectionBuilder().withUrl("/homehub").build();
-            connection.on("ReceiveData", function (result) {
-                // update dashboard with new data
-                console.log(result); //tampilkan data ini di gauge pressure
-            });
-            connection.start();
+        <script src="~/assets/vendor/chart.js/Chart.bundle.min.js" asp-append-version="true"></script>
+        <script src="~/assets/vendor/chart.js/chartPlugin.js" asp-append-version="true"></script>
+        <script type="text/javascript" asp-append-version="true">
 
-            //start current data
-            var pressCtx = document.getElementById('press').getContext('2d');
-            var gaugeViewCtx = document.getElementById('gaugeView').getContext('2d');
+            //ready document
+            $(document).ready(function () {
+                //table record data
+                var oTable = $('#tb-record').DataTable(
+                    {
+                        "searching": false,
+                        "lengthChange": false,  // Disable the "Show entries" dropdown
+                        pageLength: 5,      // Set the default number of entries displayed to 10
+                        "serverSide": true, // for process server side
+                        "scrollY": true,
+                        "scrollX": true,
+                        "autoWidth": false,
+                        "scrollCollapse": true,
+                        "paging": true,
+                        "fixedColumns": true,
+                        "processing": true,
+                        "ajax": {
+                            "url": "@Url.Action("GetDataRecord","Home")",
+                            "type": "POST",
+                            "datatype": "json"
+                        },
+                        "columnDefs": [{
+                            "targets": 0,
+                            "visible": false,
+                            "searchable": false
+                        }],
+                        "columns": [
+                            { "data": "historicalID", "name": "HistoricalID", "autoWidth": true },
+                            { "data": "locationName", "name": "LocationName", "autoWidth": true },
+                            { "data": "pressure", "name": "Pressure", "autoWidth": true },
+                            { "data": "timeStamp", "name": "TimeStamp", "autoWidth": true },
+                         ]
+                    }
+                ); //end datatable
 
-            var dataValue = ((Math.random() * 9) + 1).toFixed(2);
+               //pressure live data
+                var press = null;
+                var gaugeView = null;
 
-            var press = new Chart(pressCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Current Pressure'],
-                    datasets: [{
-                        data: [dataValue, 10 - dataValue],
-                        backgroundColor: ['#36b9cc', 'rgba(0, 0, 0, 0)'],
-                    }]
-                },
-                options: {
+                //start current data
+                var pressCanvas = document.getElementById('press');
+                var pressCtx = pressCanvas.getContext('2d');
+                var gaugeViewCtx = document.getElementById('gaugeView').getContext('2d');
+                //
+                var pressOptions = {
                     responsive: true,
                     cutoutPercentage: 70, // Adjust this value to control the size of the center hole
                     legend: {
@@ -45,123 +66,174 @@
                     rotation: -Math.PI, // Rotates the chart to make it a half-circle
                     circumference: Math.PI, // Sets the circumference to make it a half-circle
                     animation: {
-                        animateRotate: true,
+                        animateRotate: false,
                         animateScale: false,
-                        onComplete: function () {
-                            var chart = this.chart;
-                            var valueText = dataValue
-                            var unitText = 'Bar';
-
-                            var width = chart.chart.width;
-                            var height = chart.chart.height;
-                            var ctx = chart.chart.ctx;
-
-                            ctx.restore();
-                            var valueFontSize = (height / 3).toFixed(2); // Adjust the divisor to increase or decrease the font size of the value
-                            var unitFontSize = (height / 6).toFixed(2); // Adjust the divisor to increase or decrease the font size of the unit
-
-                            ctx.font = "bold " + valueFontSize + "px Arial"; // Set the font style and size for the value
-                            ctx.textBaseline = "middle";
-                            ctx.fillStyle = "#36b9cc"; // Set the text color for the value
-
-                            ctx.textAlign = 'center';
-                            ctx.fillText(valueText, width / 2, height / 1.6); // Adjust the vertical position of the value
-
-                            ctx.font = unitFontSize + "px Arial"; // Set the font style and size for the unit
-                            ctx.fillStyle = "#6c757d"; // Set the text color for the unit
-
-                            ctx.fillText(unitText, width / 2, height / 1.2); // Adjust the vertical position of the unit
-                            ctx.save();
-
+                    },
+                    elements: {
+                        arc: {
+                            borderWidth: 10
                         }
                     }
-                }
-            });
-
-
-            var gaugeView = new Chart(gaugeViewCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['LL', 'L', 'N', 'H', 'HH'],
-                    datasets: [{
-                        data: [1, 1, 6, 1, 1],
-                        backgroundColor: ['#212529', '#6c757d', '#36b9cc', '#ffc107', '#dc3545']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    cutoutPercentage: 95, // Adjust this value to control the size of the center hole and the thickness of the overlay
-                    legend: {
-                        display: false
-                    },
-                    tooltips: {
-                        enabled: false
-                    },
-                    hover: {
-                        mode: null // Disable hover effect
-                    },
-                    rotation: -Math.PI, // Rotates the chart to make it a half-circle
-                    circumference: Math.PI, // Sets the circumference to make it a half-circle
-                    animation: {
-                        animateRotate: false, // Disable rotation animation
-                        animateScale: false, // Disable scaling animation
-                    }
-                }
-            });
-            //end current data
-
-            //start data visualization
-            var tableRows = document.querySelectorAll(".table tbody tr"); // Get the table rows
-
-            // Extract data from table rows
-            var dataLabels = [];
-            var dataValues = [];
-            for (var i = 0; i < tableRows.length; i++) {
-                var row = tableRows[i];
-                var cells = row.getElementsByTagName("td");
-                var value = parseFloat(cells[0].textContent);
-                if (!isNaN(value)) { // Skip null or empty values
-                    dataValues.push(value);
-                    dataLabels.push(cells[1].textContent);
-                }
-            }
-
-            // Create the line chart
-            var ctx = document.getElementById('dataVisualization').getContext('2d');
-            var dataVisualization = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dataLabels,
-                    datasets: [{
-                        label: 'Pressure Value',
-                        data: dataValues,
-                        borderColor: '#36b9cc',
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        xAxes: [{
-                            display: true,
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Timestamp'
-                            }
-                        }],
-                        yAxes: [{
-                            display: true,
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Pressure Value'
-                            }
+                };
+                //gauge pressure
+                const pressConfig = {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Current Pressure'],
+                        datasets: [{
+                            data: [0, 10 - 0],
+                            backgroundColor: ['#36b9cc', 'rgba(0, 0, 0, 0)'],
                         }]
+                    },
+                    options: pressOptions
+                };
+
+                //gauge alarm
+                const alarmConfig = {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['LL', 'L', 'N', 'H', 'HH'],
+                        datasets: [{
+                            data: [1, 1, 6, 1, 1],
+                            backgroundColor: ['#212529', '#6c757d', '#36b9cc', '#ffc107', '#dc3545']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        cutoutPercentage: 95, // Adjust this value to control the size of the center hole and the thickness of the overlay
+                        legend: {
+                            display: false
+                        },
+                        tooltips: {
+                            enabled: false
+                        },
+                        hover: {
+                            mode: null // Disable hover effect
+                        },
+                        //,
+                        rotation: -Math.PI, // Rotates the chart to make it a half-circle
+                        circumference: Math.PI, // Sets the circumference to make it a half-circle
+                        animation: {
+                            animateRotate: false, // Disable rotation animation
+                            animateScale: false, // Disable scaling animation
+                        },
+                        plugins: {
+                            centerText: false   // disable plugin 'p1' for this instance
+                        }
+                    }
+                };
+
+                //Initial chart
+               press = new Chart(pressCtx, pressConfig);
+               console.log(press);
+               gaugeView = new Chart(gaugeViewCtx, alarmConfig);
+
+                // Function to initialize the chart
+                function UpdatePressChartChart(value) {
+                    press.data.datasets[0].data = [value, 10 - value];
+                    press.update();
+                }
+                function renderCenterText(chart) {
+                    var valueText = chart.datasets[0].data[0];
+                    console.log(valueText);
+                    var width = chart.chart.width;
+                    var height = chart.chart.height;
+                    var ctx = chart.chart.ctx;
+
+                    ctx.restore();
+                    var valueFontSize = (height / 3).toFixed(2); // Adjust the divisor to increase or decrease the font size of the value
+                    var unitFontSize = (height / 6).toFixed(2); // Adjust the divisor to increase or decrease the font size of the unit
+
+                    ctx.font = "bold " + valueFontSize + "px Arial"; // Set the font style and size for the value
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = "#36b9cc"; // Set the text color for the value
+
+                    ctx.textAlign = 'center';
+                    ctx.fillText(valueText, width / 2, height / 1.6); // Adjust the vertical position of the value
+
+                    ctx.font = unitFontSize + "px Arial"; // Set the font style and size for the unit
+                    ctx.fillStyle = "#6c757d"; // Set the text color for the unit
+
+                    ctx.fillText(unitText, width / 2, height / 1.2); // Adjust the vertical position of the unit
+                    ctx.save();
+                }
+
+                // Function to fetch updated data from the server
+                function fetchData() {
+                    $.ajax({
+                        url: '@Url.Action("GetLiveData","Home")',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            UpdatePressChartChart(data);
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }
+                // Refresh the chart at regular intervals
+               setInterval(fetchData, 5000);
+
+
+                ////end current data
+
+                //start data visualization
+                var tableRows = document.querySelectorAll(".table tbody tr"); // Get the table rows
+
+                // Extract data from table rows
+                var dataLabels = [];
+                var dataValues = [];
+                for (var i = 0; i < tableRows.length; i++) {
+                    var row = tableRows[i];
+                    var cells = row.getElementsByTagName("td");
+                    var value = parseFloat(cells[0].textContent);
+                    if (!isNaN(value)) { // Skip null or empty values
+                        dataValues.push(value);
+                        dataLabels.push(cells[1].textContent);
                     }
                 }
-            });
-            //end data visualization
 
+                // Create the line chart
+                var ctx = document.getElementById('dataVisualization').getContext('2d');
+                var dataVisualization = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dataLabels,
+                        datasets: [{
+                            label: 'Pressure Value',
+                            data: dataValues,
+                            borderColor: '#36b9cc',
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            xAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Timestamp'
+                                }
+                            }],
+                            yAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Pressure Value'
+                                }
+                            }]
+                        },
+                        plugins: {
+                            centerText: false   // disable plugin 'p1' for this instance
+                        }
+                    }
+                });
+                //end data visualization
+
+            }); //end Document
 
         </script>
     }
@@ -202,34 +274,9 @@
                             Last Record Data
                         </a>
                     </h5>
-                    <div class="table-responsive">
-                        <table id="tb-tanklivedata" class="table table-sm table-striped table-bordered dt-responsive nowrap text-sm table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th class="fw-bold">Pressure Value</th>
-                                    <th class="fw-bold">Timestamp</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>3.14</td>
-                                    <td>2023-05-25 10:15:22</td>
-                                </tr>
-                                <tr>
-                                    <td>2.76</td>
-                                    <td>2023-05-25 11:20:10</td>
-                                </tr>
-                                <tr>
-                                    <td>4.82</td>
-                                    <td>2023-05-25 12:35:45</td>
-                                </tr>
-                                <tr>
-                                    <td>1.97</td>
-                                    <td>2023-05-25 13:45:30</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <!-- Tank Table -->
+                    @await Html.PartialAsync("_ViewAll", Model)
+                    <!-- End Tank table -->
                 </div>
             </div>
         </div>
@@ -238,7 +285,7 @@
 
     <div class="row my-4">
         <div class="col-12">
-            <div class="card shadow-lg" > 
+            <div class="card shadow-lg">
                 <div class="card-header bg-gradient-info p-1"></div>
                 <div class="card-body">
                     <h5 class="card-title">Data Visualization</h5>
