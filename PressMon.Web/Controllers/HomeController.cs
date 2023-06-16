@@ -45,7 +45,7 @@ namespace PressMon.Web.Controllers
             int skip = start != null ? Convert.ToInt32(start) : 0;
             int recordsTotal = 0;
 
-            var liveDatas = (from p in _context.Historicals select p).OrderBy(x => x).Reverse();
+            var liveDatas = (from p in _context.Historicals select p).OrderBy(x => x);
             var Datas = from p in liveDatas
                         select new
                         {
