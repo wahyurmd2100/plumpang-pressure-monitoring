@@ -1,0 +1,88 @@
+﻿@model TMS.Web.Models.AlarmSettings
+
+@{
+    ViewData["Title"] = "AddOrEdit";
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-md-12">
+        @*<form asp-action="AddOrEdit" asp-route-id="@Model.ProductId" onsubmit="return jQueryAjaxPost(this);" autocomplete="off">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ProductId" />
+            <div class="form-group">
+                <label asp-for="ProductCode" class="control-label"></label>
+                <input asp-for="ProductCode" class="form-control" />
+                <span asp-validation-for="ProductCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductName" class="control-label"></label>
+                <input asp-for="ProductName" class="form-control" />
+                <span asp-validation-for="ProductName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HexColor" class="control-label"></label>
+                <input asp-for="HexColor" class="form-control" />
+                <span asp-validation-for="HexColor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DefaultDensity" class="control-label"></label>
+                <input asp-for="DefaultDensity" class="form-control" />
+                <span asp-validation-for="DefaultDensity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DefaultTemp" class="control-label"></label>
+                <input asp-for="DefaultTemp" class="form-control" />
+                <span asp-validation-for="DefaultTemp" class="text-danger"></span>
+            </div>
+            <div class="form-group" class="col text-center">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Discard</button>
+                    <button type="submit" class="btn btn-success">Save changes</button>
+            </div>
+        </form>*@
+
+        <form>
+            <div class="form-row">
+                <div class="col-auto">
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 50px;">LL</span>
+                        </div>
+                        <input type="text" class="form-control" id="inlineFormInputGroup" value="1.00" disabled>
+                    </div>
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 50px;">L</span>
+                        </div>
+                        <input type="text" class="form-control" id="inlineFormInputGroup" value="2.00" disabled>
+                    </div>
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 50px;">H</span>
+                        </div>
+                        <input type="text" class="form-control" id="inlineFormInputGroup" value="8.00" disabled>
+                    </div>
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="width: 50px;">HH</span>
+                        </div>
+                        <input type="text" class="form-control" id="inlineFormInputGroup" value="9.00" disabled>
+                    </div>
+                    <button type="button" class="btn btn-warning" id="editButton">
+                        <i class="fas fa-edit fa-lg"></i> Edit
+                    </button>
+                    <button type="button" class="btn btn-success d-none" id="saveButton">
+                        <i class="fas fa-save fa-lg"></i> Save
+                    </button>
+                    <button type="button" class="btn btn-secondary d-none" id="cancelButton">
+                        <i class="fas fa-times fa-lg"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
