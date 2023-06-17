@@ -15,9 +15,12 @@
                         "scrollX": true,
                         "autoWidth": false,
                         "scrollCollapse": true,
-                        "paging": true,
+                        "paging": false,
                         "fixedColumns": true,
                         "processing": true,
+                        "searching" : false,
+                        "lengthChange": false,
+                       "info" : false,
                         "ajax": {
                             "url": "@Url.Action("LoadData")",
                             "type": "POST",
@@ -36,9 +39,10 @@
                             {
                                 data: null,
                                 render: function (data, type, full, meta) {
-                                    //console.log(full);
+                                    //console.log(meta);
                                     return "<button type='button' class='btn btn-warning' onclick=UpdateData('" + full.productId + "');><i class='fas fa-edit fa-lg'></i> Edit</button>";
-                                }
+                                },
+                                "width" : "1%"
                             },
                             { "data": "info", "name": "Info", "autoWidth": true },
                             { "data": "value", "name": "Value", "autoWidth": true }
@@ -53,7 +57,7 @@
     }
 </head>
 
-<div class="container-fluid">
+<div class="container-fluid py-3">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h4 mb-0 text-gray-800">Alarm Settings</h1>
