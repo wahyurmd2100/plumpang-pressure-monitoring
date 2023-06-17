@@ -62,7 +62,7 @@
         <ul class="navbar-nav bg-gradient-info sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center"  asp-area="" asp-controller="Home" asp-action="Index">
                 <div class="sidebar-brand-icon">
                     @*<img src="~/assets/img/pertamina_logo.png" alt="Pertamina" width="60" height="40" class="mx-2">*@
                 </div>
@@ -214,20 +214,10 @@
                         </span>
                     </li>
                 </ul>
-
-                @*<p class="navbar-item mt-3 font-weight-normal" style="font-size: 1.25vw; height: auto;">
-                    <span class="border-end mr-3">
-                        Alarm
-                    </span>
-                    
-                    <span class="rounded-pill bg-danger text-white px-3 py-1" id="blinkingText">
-                        Pressure : <b>9.98 Bar</b>
-                    </span>
-                </p>*@
                 <!-- End Topbar Title -->
 
                 <!-- Topbar Navbar -->
-                <ul class="navbar-nav ml-auto">
+                @*<ul class="navbar-nav ml-auto">
 
                     <!-- Nav Item - Alerts -->
                     <li class="nav-item dropdown no-arrow mx-1">
@@ -323,7 +313,7 @@
                         </div>
                     </li>
 
-                </ul>
+                </ul>*@
 
             </nav>
             <!-- End of Topbar -->
