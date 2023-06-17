@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PressMon.Web.Data;
-using System.Linq;
-using System;
-using System.Linq.Dynamic.Core;
-using TMS.Web.Models;
+using Microsoft.EntityFrameworkCore;
 using PressMon.Web;
+using PressMon.Web.Data;
+using System;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using TMS.Web.Models;
 
 namespace TMS.Web.Controllers
 {
@@ -73,13 +74,60 @@ namespace TMS.Web.Controllers
             }
             else
             {
-                var product = await _context.AlarmSettings.FindAsync(id);
-                if (product == null)
+                var alarmSettings = await _context.AlarmSettings.FindAsync(id);
+                if (alarmSettings == null)
                 {
                     return NotFound();
                 }
-                return View(product);
+                return View(alarmSettings);
             }
+        }
+
+        // POST: Products/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddOrEdit(int id, [Bind("AlarmSettingID,Value,Info")] AlarmSettings alarmSettings)
+        {
+
+            if (ModelState.IsValid)
+            {
+                if (id == 0)
+                {
+                    //alarmSettings.CreateTime = DateTime.Now;
+                    //_context.Add(alarmSettings);
+                    //await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    try
+                    {
+                        //alarmSettings.UpdateTime = DateTime.Now;
+                        _context.Update(alarmSettings);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!AlarmSettingsExists(alarmSettings.AlarmSettingID))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                }
+
+                return Json(new { isValid = true, html = Helper.RenderRazorViewString(this, "_ViewAll", _context.AlarmSettings.ToList()) });
+            }
+            return Json(new { isValid = false, html = Helper.RenderRazorViewString(this, "AddOrEdit", alarmSettings) });
+        }
+
+        private bool AlarmSettingsExists(int id)
+        {
+            return _context.AlarmSettings.Any(e => e.AlarmSettingID == id);
         }
     }
 }

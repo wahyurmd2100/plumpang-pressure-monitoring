@@ -40,7 +40,7 @@
                             {
                                 data: null,
                                 render: function (data, type, full, meta) {
-                                    console.log(full);
+                                    //console.log(full);
                                     return "<button type='button' class='btn btn-warning btn-sm' onclick=UpdateData('" + full.alarmSettingID + "');><i class='fas fa-edit fa-lg'></i> Edit</button>";
                                 },
                                 "width" : "1%"
@@ -55,6 +55,7 @@
 
             //update data
             function UpdateData(Id) {
+                console.log(Id);
                 var toSend =
                 {
                     id: Id
@@ -68,7 +69,7 @@
                         jQuery.noConflict();
                         $("#form-modal").modal();
                         $("#form-modal .modal-body").html(res);
-                        $("#form-modal .modal-title").html('Edit Tank Ticket');
+                        $("#form-modal .modal-title").html('Edit Value');
                         $("#form-modal").modal('show');
                     },
                     error: function (res) {
