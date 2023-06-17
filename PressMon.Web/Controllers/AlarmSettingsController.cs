@@ -4,6 +4,8 @@ using System.Linq;
 using System;
 using System.Linq.Dynamic.Core;
 using TMS.Web.Models;
+using PressMon.Web;
+using System.Threading.Tasks;
 
 namespace TMS.Web.Controllers
 {
@@ -59,6 +61,24 @@ namespace TMS.Web.Controllers
             catch (Exception)
             {
                 throw;
+            }
+        }
+        // GET: Banks/AddOrEdit
+        [NoDirectAccess]
+        public async Task<IActionResult> AddOrEdit(int id = 0)
+        {
+            if (id == 0)//flagged as insert
+            {
+                return View(new AlarmSettings());
+            }
+            else
+            {
+                var product = await _context.AlarmSettings.FindAsync(id);
+                if (product == null)
+                {
+                    return NotFound();
+                }
+                return View(product);
             }
         }
     }

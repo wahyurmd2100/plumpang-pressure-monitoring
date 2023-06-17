@@ -6,6 +6,7 @@
 <head>
     @section Scripts{
         <script>
+            //document ready
             var oTable;
             $(document).ready(function () {
                 oTable = $('#tb-AlarmSettings').DataTable(
@@ -39,8 +40,8 @@
                             {
                                 data: null,
                                 render: function (data, type, full, meta) {
-                                    //console.log(meta);
-                                    return "<button type='button' class='btn btn-warning' onclick=UpdateData('" + full.productId + "');><i class='fas fa-edit fa-lg'></i> Edit</button>";
+                                    console.log(full);
+                                    return "<button type='button' class='btn btn-warning btn-sm' onclick=UpdateData('" + full.alarmSettingID + "');><i class='fas fa-edit fa-lg'></i> Edit</button>";
                                 },
                                 "width" : "1%"
                             },
@@ -52,6 +53,30 @@
             });
             //end document ready
 
+            //update data
+            function UpdateData(Id) {
+                var toSend =
+                {
+                    id: Id
+                };
+                $.ajax({
+                    type: "GET",
+                    contentType: "application/json; charset=utf-8",
+                    url: "@Url.Action("AddOrEdit")",
+                    data: toSend,
+                    success: function (res) {
+                        jQuery.noConflict();
+                        $("#form-modal").modal();
+                        $("#form-modal .modal-body").html(res);
+                        $("#form-modal .modal-title").html('Edit Tank Ticket');
+                        $("#form-modal").modal('show');
+                    },
+                    error: function (res) {
+                        console.log(res);
+                    }
+                })
+            }
+            //end update data
 
         </script>
     }
