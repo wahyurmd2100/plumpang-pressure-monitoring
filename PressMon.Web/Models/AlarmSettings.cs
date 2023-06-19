@@ -9,5 +9,6 @@ namespace TMS.Web.Models
         public int AlarmSettingID { get; set; }
         public double Value { get; set; }
         public string Info { get; set; }
+        public int UpdateTimestamp { get; set; }
     }
 }

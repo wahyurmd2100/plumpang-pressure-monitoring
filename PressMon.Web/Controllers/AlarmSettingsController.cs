@@ -39,22 +39,29 @@ namespace TMS.Web.Controllers
                 int recordsTotal = 0;
 
                 // getting all data  
-                var product = (from p in _context.AlarmSettings select p);//LINQ
+                var alarmSettings = (from p in _context.AlarmSettings 
+                                     select new
+                                     {
+                                         p.AlarmSettingID,
+                                         p.Value,
+                                         p.Info,
+                                         UpdateTimestamp = UnixTimeStampToDateTime(p.UpdateTimestamp)
+                                     }).OrderBy(t => t.AlarmSettingID);
                 //Sorting  
-                if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
-                {
-                    product = product.OrderBy(sortColumn + " " + sortColumnDirection);
-                }
+                //if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
+                //{
+                //    alarmSettings = alarmSettings.OrderBy(sortColumn + " " + sortColumnDirection);
+                //}
                 //Search  
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    product = product.Where(m => m.Info.Contains(searchValue));
-                }
+                //if (!string.IsNullOrEmpty(searchValue))
+                //{
+                //    alarmSettings = alarmSettings.Where(m => m.Info.Contains(searchValue));
+                //}
 
                 //total number of rows counts   
-                recordsTotal = product.Count();
+                recordsTotal = alarmSettings.Count();
                 //Paging   
-                var data = product.Skip(skip).Take(pageSize).ToList();
+                var data = alarmSettings.Skip(skip).Take(pageSize).ToList();
                 //Returning Json Data  
                 return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });
             }
@@ -64,6 +71,7 @@ namespace TMS.Web.Controllers
                 throw;
             }
         }
+        
         // GET: Banks/AddOrEdit
         [NoDirectAccess]
         public async Task<IActionResult> AddOrEdit(int id = 0)
@@ -88,7 +96,7 @@ namespace TMS.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddOrEdit(int id, [Bind("AlarmSettingID,Value,Info")] AlarmSettings alarmSettings)
+        public async Task<IActionResult> AddOrEdit(int id, [Bind("AlarmSettingID,Value,Info,UpdateTimestamp")] AlarmSettings alarmSettings)
         {
 
             if (ModelState.IsValid)
@@ -103,7 +111,7 @@ namespace TMS.Web.Controllers
                 {
                     try
                     {
-                        //alarmSettings.UpdateTime = DateTime.Now;
+                        alarmSettings.UpdateTimestamp = Convert.ToInt32(DateTimeOffset.Now.ToUnixTimeSeconds());
                         _context.Update(alarmSettings);
                         await _context.SaveChangesAsync();
                     }
@@ -129,5 +137,17 @@ namespace TMS.Web.Controllers
         {
             return _context.AlarmSettings.Any(e => e.AlarmSettingID == id);
         }
+
+        private static string UnixTimeStampToDateTime(int unixTimeStamp)
+        {
+            // Convert Unix timestamp to DateTimeOffset
+
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds((long)unixTimeStamp);
+            // Convert DateTimeOffset to desired datetime string format
+            string datetimeString = dateTimeOffset.ToString("yyyy-MM-dd HH:mm:ss");
+            return datetimeString;
+        }
+
+
     }
 }

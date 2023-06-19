@@ -40,13 +40,14 @@
                             {
                                 data: null,
                                 render: function (data, type, full, meta) {
-                                    //console.log(full);
+                                    console.log(full);
                                     return "<button type='button' class='btn btn-warning btn-sm' onclick=UpdateData('" + full.alarmSettingID + "');><i class='fas fa-edit fa-lg'></i> Edit</button>";
                                 },
                                 "width" : "1%"
                             },
                             { "data": "info", "name": "Info", "autoWidth": true },
-                            { "data": "value", "name": "Value", "autoWidth": true }
+                            { "data": "value", "name": "Value", "autoWidth": true },
+                            { "data": "updateTimestamp", "name": "UpdateTimestamp", "autoWidth": true }
                         ]
                     });
 
