@@ -17,7 +17,7 @@
                     {
                         "searching": false,
                         "lengthChange": false,  // Disable the "Show entries" dropdown
-                        pageLength: 5,      // Set the default number of entries displayed to 10
+                        "pageLength": 5,      // Set the default number of entries displayed to 10
                         "serverSide": true, // for process server side
                         "scrollY": true,
                         "scrollX": true,
@@ -26,6 +26,7 @@
                         "paging": true,
                         "fixedColumns": true,
                         "processing": false,
+                        "info": false,
                         "ajax": {
                             "url": "@Url.Action("GetDataRecord","Home")",
                             "type": "POST",
@@ -41,11 +42,11 @@
                             { "data": "locationName", "name": "LocationName", "autoWidth": true },
                             { "data": "pressure", "name": "Pressure", "autoWidth": true },
                             { "data": "timeStamp", "name": "TimeStamp", "autoWidth": true },
-                         ]
+                        ]
                     }
                 ); //end datatable
 
-               //pressure live data
+                //pressure live data
                 var press = null;
                 var gaugeView = null;
 
@@ -124,9 +125,9 @@
                 };
 
                 //Initial chart
-               press = new Chart(pressCtx, pressConfig);
-               console.log(press);
-               gaugeView = new Chart(gaugeViewCtx, alarmConfig);
+                press = new Chart(pressCtx, pressConfig);
+                console.log(press);
+                gaugeView = new Chart(gaugeViewCtx, alarmConfig);
 
                 // Function to initialize the chart
                 function UpdatePressChartChart(value) {
@@ -174,7 +175,7 @@
                     });
                 }
                 // Refresh the chart at regular intervals
-               setInterval(fetchData, 5000);
+                setInterval(fetchData, 5000);
 
 
                 ////end current data
