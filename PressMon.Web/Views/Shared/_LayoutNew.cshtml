@@ -15,14 +15,16 @@
     <!-- Page Wrapper -->
     <div id="wrapper">
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-info sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav bg-white shadow-lg sidebar sidebar-light accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" asp-area="" asp-controller="Home" asp-action="Index">
+            <a class="sidebar-brand d-flex align-items-center justify-content-centerange-field" asp-area="" asp-controller="Home" asp-action="Index">
                 <div class="sidebar-brand-icon">
-                    @*<img src="~/assets/img/pertamina_logo.png" alt="Pertamina" width="60" height="40" class="mx-2">*@
+                    <img src="~/assets/img/patra-niaga-logo.webp" alt="Patra Niaga Logo" class="img-fluid" style="max-height:50px;">
                 </div>
-                <div class="sidebar-brand-text mx-2 text-white" style="font-size: small;">PRESSURE MONITORING</div>
+                <div class="sidebar-brand-text" style="font-size: small;">
+                    <img src="~/assets/img/patra-niaga-label.webp" alt="Patra Niaga Label" class="img-fluid" style="max-height:50px;">
+                </div>
             </a>
 
             <!-- Divider -->
@@ -74,7 +76,15 @@
                     </div>
                 </div>
             </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="" asp-action="">
+                    <i class="fas fa-info-circle fa-fw"></i>
+                    <span>About App</span>
+                </a>
+            </li>
             <!-- End Nav Item - Configuration Collapse Menu -->
+
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 
@@ -84,11 +94,11 @@
             </div>
 
             <!-- Sidebar Logo Citia -->
-            <div class="sidebar-card d-none d-lg-flex bg-transparent">
+            @*<div class="sidebar-card d-none d-lg-flex bg-transparent">
                 <a href="https://citia-engineering.com/">
                     <img src="~/assets/img/citia_logo_putih.png" alt="Citia Engineering" width="90" height="90" class="py-1" />
                 </a>
-            </div>
+            </div>*@
             <!-- End Sidebar Logo Citia -->
         </ul>
         <!-- End Sidebar -->
