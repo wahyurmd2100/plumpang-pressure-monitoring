@@ -6,56 +6,7 @@
     <title>Pressure Monitoring - @ViewData["Title"]</title>
     <partial name="_Styles" />
     @RenderSection("Styles", required: false)
-    <script>
-        window.onload = function () {
-            var blinkingText = document.getElementById("blinkingText");
-            var sound = document.getElementById("sound");
-            var visibleDuration = sound.duration * 1000; // Duration in milliseconds for the visible state
-            var hiddenDuration = visibleDuration/2; // Duration in milliseconds for the hidden state
-            var blinkInterval; // Variable to store the interval ID
-            
-
-            function blinkText() {
-                if (blinkingText.style.visibility === "" || blinkingText.style.visibility === "visible") {
-                    blinkingText.style.visibility = "hidden";
-                    setTimeout(function () {
-                        blinkingText.style.visibility = "visible";
-                        sound.play();
-                    }, hiddenDuration);
-                } else {
-                    blinkingText.style.visibility = "visible";
-                    setTimeout(function () {
-                        blinkingText.style.visibility = "hidden";
-                        sound.pause();
-                        sound.currentTime = 0;
-                    }, visibleDuration);
-                }
-            }
-
-            function handleMouseEnter() {
-                clearInterval(blinkInterval); // Clear the blinking interval
-                blinkingText.style.visibility = "visible";
-            }
-
-            function handleMouseLeave() {
-                clearInterval(blinkInterval); // Clear the blinking interval
-                blinkingText.style.visibility = "hidden";
-                blinkInterval = setInterval(blinkText, visibleDuration + hiddenDuration); // Start the blinking interval from hidden state
-            }
-
-            blinkInterval = setInterval(blinkText, visibleDuration + hiddenDuration); // Start the initial blinking interval
-
-            blinkingText.addEventListener("mouseenter", handleMouseEnter);
-            blinkingText.addEventListener("mouseleave", handleMouseLeave);
-
-            
-        };
-
-
-
-
-
-    </script>
+   
 </head>
 
 
@@ -100,7 +51,7 @@
             <!-- Divider -->
             <hr class="sidebar-divider">
 
-            
+
 
             <!-- Heading -->
             <div class="sidebar-heading">
@@ -124,7 +75,6 @@
                 </div>
             </li>
             <!-- End Nav Item - Configuration Collapse Menu -->
-
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 
@@ -162,111 +112,13 @@
                     <div class="topbar-divider d-none d-sm-block"></div>
                     <li class="nav-item mt-1">
                         <span class="btn btn-danger btn-sm px-3 py-1 cursor-pointer" id="blinkingText">
-                            Pressure : <b>9.98 Bar</b>
+                            Pressure : <b id="press-value"></b>
                         </span>
-                        <audio id="sound" src="/assets/wav/alarmSound.wav" autoplay></audio>
+                        <audio id="sound" src="~/assets/wav/alarmSound.wav"></audio>
                     </li>
                 </ul>
                 <!-- End Alarm Section -->
-
-                <!-- Topbar Navbar -->
-                @*<ul class="navbar-nav ml-auto">
-
-                <!-- Nav Item - Alerts -->
-                <li class="nav-item dropdown no-arrow mx-1">
-                <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-bell fa-fw"></i>
-                <!-- Counter - Alerts -->
-                <span class="badge badge-danger badge-counter">3+</span>
-                </a>
-                <!-- Dropdown - Alerts -->
-                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                aria-labelledby="alertsDropdown">
-                <h6 class="dropdown-header bg-info border-info">
-                Alerts Center
-                </h6>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                <div class="mr-3">
-                <div class="icon-circle bg-danger">
-                <i class="fas fa-exclamation-triangle text-white"></i>
-                </div>
-                </div>
-                <div>
-                <div class="small text-gray-500">2023/05/28 15:07:22</div>
-                Pressure over HH limit, <br />
-                Pressure : <b>9.98 Bar</b>
-                </div>
-                </a>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                <div class="mr-3">
-                <div class="icon-circle bg-danger">
-                <i class="fas fa-exclamation-triangle text-white"></i>
-                </div>
-                </div>
-                <div>
-                <div class="small text-gray-500">2023/05/28 15:07:22</div>
-                Pressure below LL limit, <br />
-                Pressure : <b>1.01 Bar</b>
-                </div>
-                </a>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                <div class="mr-3">
-                <div class="icon-circle bg-danger">
-                <i class="fas fa-exclamation-triangle text-white"></i>
-                </div>
-                </div>
-                <div>
-                <div class="small text-gray-500">2023/05/28 15:07:22</div>
-                Pressure over H limit, <br />
-                Pressure : <b>8.11 Bar</b>
-                </div>
-                </a>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                <div class="mr-3">
-                <div class="icon-circle bg-danger">
-                <i class="fas fa-exclamation-triangle text-white"></i>
-                </div>
-                </div>
-                <div>
-                <div class="small text-gray-500">2023/05/28 15:07:22</div>
-                Pressure below L limit, <br />
-                Pressure : <b>2.07 Bar</b>
-                </div>
-                </a>
-                <a class="dropdown-item text-center small text-gray-500" href="#">Show Alarms Log</a>
-                </div>
-                </li>
-
-                <div class="topbar-divider d-none d-sm-block"></div>
-
-                <!-- Nav Item - User Information -->
-                <li class="nav-item dropdown no-arrow">
-                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small"></span>
-                <img class="img-profile rounded-circle" src="~/assets/img/undraw_profile.svg">
-                </a>
-                <!-- Dropdown - User Information -->
-                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                aria-labelledby="userDropdown">
-                <a class="dropdown-item" href="user/profile.html">
-                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                Profile
-                </a>
-                <a class="dropdown-item" href="#">
-                <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                Activity Log
-                </a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" asp-route-returnUrl="@Url.Page("/", new { area = "" })">
-                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                Logout
-                </a>
-                </div>
-                </li>
-
-                </ul>*@
+                
 
             </nav>
             <!-- End of Topbar -->
@@ -292,6 +144,75 @@
         </div>
     </div>
     <partial name="_Scripts" />
+    <script>
+        //ready document
+        $(document).ready(function () {
+            var blinkingText = document.getElementById("blinkingText");
+            var press = document.getElementById("press-value");
+            var sound = document.getElementById("sound");
+            var visibleDuration = sound.duration * 1000; // Duration in milliseconds for the visible state
+            var hiddenDuration = visibleDuration / 2; // Duration in milliseconds for the hidden state
+            var blinkInterval; // Variable to store the interval ID
+
+
+            function blinkText() {
+                if (blinkingText.style.visibility === "" || blinkingText.style.visibility === "visible") {
+                    blinkingText.style.visibility = "hidden";
+                    setTimeout(function () {
+                        blinkingText.style.visibility = "visible";
+                        sound.play();
+                    }, hiddenDuration);
+                } else {
+                    blinkingText.style.visibility = "visible";
+                    setTimeout(function () {
+                        blinkingText.style.visibility = "hidden";
+                        sound.pause();
+                        //sound.currentTime = 0;
+                    }, visibleDuration);
+                }
+            }
+            function Disabled() {
+                blinkingText.style.visibility = "hidden";
+                sound.pause();
+                sound.currentTime = 0;
+            }
+            function SettingAlarm() {
+                $.ajax({
+                    url: '@Url.Action("GetLiveData","Home")',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log('DATA: ', data);
+                        press.textContent = data.toString()+" Bar";
+                        if (data > 7) {
+                            blinkText();
+                        }
+                        else {
+                            Disabled();
+                        }
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
+            function handleMouseEnter() {
+                clearInterval(blinkInterval); // Clear the blinking interval
+                blinkingText.style.visibility = "visible";
+            }
+
+            //function handleMouseLeave() {
+            //    clearInterval(blinkInterval); // Clear the blinking interval
+            //    blinkingText.style.visibility = "hidden";
+            //    blinkInterval = setInterval(blinkText, visibleDuration + hiddenDuration); // Start the blinking interval from hidden state
+            //}
+
+            blinkInterval = setInterval(SettingAlarm, visibleDuration + hiddenDuration); // Start the initial blinking interval
+
+            blinkingText.addEventListener("mouseenter", handleMouseEnter);
+            ////blinkingText.addEventListener("mouseleave", handleMouseLeave);
+        });
+    </script>
     @if (IsSectionDefined("AddToHead"))
     {
         @RenderSection("AddToHead", required: false)
