@@ -45,7 +45,7 @@ namespace PressMon.Service
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogInformation("Worker running at: {time} , Exception Message ={0}", DateTimeOffset.Now, ex.Message);
+                    _logger.LogInformation("Worker running at: {time} , Modbus Expection Message ={0}", DateTimeOffset.Now, ex.Message);
                 }
                 await Task.Delay(_sensorConfig.TimeLoop, stoppingToken);
             }
@@ -55,15 +55,23 @@ namespace PressMon.Service
             HttpClient client = new HttpClient();
             foreach(Sensor sensor in sensors)
             {
-                var postSensor = new PostSensor() { LocationName = sensor.Location, Pressure = sensor.Value };
-                // Serialize class into JSON
-                var payload = JsonSerializer.Serialize(postSensor);
+                try
+                {
+                    var postSensor = new PostSensor() { LocationName = sensor.Location, Pressure = sensor.Value };
+                    // Serialize class into JSON
+                    var payload = JsonSerializer.Serialize(postSensor);
 
-                // Wrap our JSON inside a StringContent object
-                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                    // Wrap our JSON inside a StringContent object
+                    var content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-                // Post to the endpoint
-                var response = await client.PostAsync(url, content);
+                    // Post to the endpoint
+                    var response = await client.PostAsync(url, content);
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogInformation("Worker running at: {time} , Server Exception Message ={0}", DateTimeOffset.Now, ex.Message);
+                }
+                
             }
         }
         

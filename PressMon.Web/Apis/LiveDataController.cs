@@ -44,7 +44,7 @@ namespace TMS.Web.Apis
             var data = _context.LiveDatas.FirstOrDefault(x => x.LocationName == dataPost.LocationName);
             if (data != null)
             {
-                data.Pressure = dataPost.Pressure;
+                data.Pressure =Math.Round(dataPost.Pressure,2);
                 data.TimeStamp = Convert.ToInt32(DateTimeOffset.Now.ToUnixTimeSeconds());
                 _context.Update(data);
                 //
@@ -52,7 +52,7 @@ namespace TMS.Web.Apis
                 //
                 Historical historical = new Historical();
                 historical.LocationName = data.LocationName;
-                historical.Pressure = data.Pressure;
+                historical.Pressure = Math.Round(dataPost.Pressure, 2);
                 historical.TimeStamp = Convert.ToInt32(DateTimeOffset.Now.ToUnixTimeSeconds());
                 _context.Add(historical);
                 await _context.SaveChangesAsync();
