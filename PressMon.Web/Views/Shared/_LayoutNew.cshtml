@@ -192,34 +192,29 @@
                     type: 'GET',
                     dataType: 'json',
                     success: function (data) {
-                        press.textContent = data.toString()+" Bar";
-                        if (data > 7) {
-                            blinkText();
-                        }
-                        else {
-                            Disabled();
-                        }
+                        var value = data.value;
+                        var alarm = data.alams;
+                        data.alarms.forEach(function (item) {
+                            console.log(item.info, item.value);  
+                            if (item.info == 'H')
+                            {
+                                press.textContent = item.info.toString() + " :" + value.toString() + " Bar";
+                                if (value > item.value) {
+                                    blinkText();
+                                }
+                                else {
+                                    Disabled();
+                                }
+                            }
+                        });
+                      
                     },
                     error: function (error) {
                         console.log(error);
                     }
                 });
             }
-            function handleMouseEnter() {
-                clearInterval(blinkInterval); // Clear the blinking interval
-                blinkingText.style.visibility = "visible";
-            }
-
-            //function handleMouseLeave() {
-            //    clearInterval(blinkInterval); // Clear the blinking interval
-            //    blinkingText.style.visibility = "hidden";
-            //    blinkInterval = setInterval(blinkText, visibleDuration + hiddenDuration); // Start the blinking interval from hidden state
-            //}
-
             blinkInterval = setInterval(SettingAlarm, visibleDuration + hiddenDuration); // Start the initial blinking interval
-
-            blinkingText.addEventListener("mouseenter", handleMouseEnter);
-            ////blinkingText.addEventListener("mouseleave", handleMouseLeave);
         });
     </script>
     @if (IsSectionDefined("AddToHead"))

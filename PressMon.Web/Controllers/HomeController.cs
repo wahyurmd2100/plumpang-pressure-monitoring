@@ -45,7 +45,8 @@ namespace PressMon.Web.Controllers
         public IActionResult GetAlarm()
         {
             var data = _context.LiveDatas.FirstOrDefault(x => x.LocationName == "M-01").Pressure;
-            return Json(data);
+            var alarms = _context.AlarmSettings.ToList();
+            return Json(new { value = data, alarms = alarms });
         }
         public IActionResult GetDataRecord()
         {
