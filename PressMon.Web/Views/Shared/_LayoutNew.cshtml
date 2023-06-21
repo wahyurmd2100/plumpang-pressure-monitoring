@@ -188,11 +188,10 @@
             }
             function SettingAlarm() {
                 $.ajax({
-                    url: '@Url.Action("GetLiveData","Home")',
+                    url: '@Url.Action("GetAlarm", "Home")',
                     type: 'GET',
                     dataType: 'json',
                     success: function (data) {
-                        console.log('DATA: ', data);
                         press.textContent = data.toString()+" Bar";
                         if (data > 7) {
                             blinkText();

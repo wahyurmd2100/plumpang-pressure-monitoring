@@ -129,36 +129,7 @@
                 console.log(press);
                 gaugeView = new Chart(gaugeViewCtx, alarmConfig);
 
-                // Function to initialize the chart
-                function UpdatePressChartChart(value) {
-                    press.data.datasets[0].data = [value, 10 - value];
-                    press.update();
-                }
-                function renderCenterText(chart) {
-                    var valueText = chart.datasets[0].data[0];
-                    console.log(valueText);
-                    var width = chart.chart.width;
-                    var height = chart.chart.height;
-                    var ctx = chart.chart.ctx;
-
-                    ctx.restore();
-                    var valueFontSize = (height / 3).toFixed(2); // Adjust the divisor to increase or decrease the font size of the value
-                    var unitFontSize = (height / 6).toFixed(2); // Adjust the divisor to increase or decrease the font size of the unit
-
-                    ctx.font = "bold " + valueFontSize + "px Arial"; // Set the font style and size for the value
-                    ctx.textBaseline = "middle";
-                    ctx.fillStyle = "#36b9cc"; // Set the text color for the value
-
-                    ctx.textAlign = 'center';
-                    ctx.fillText(valueText, width / 2, height / 1.6); // Adjust the vertical position of the value
-
-                    ctx.font = unitFontSize + "px Arial"; // Set the font style and size for the unit
-                    ctx.fillStyle = "#6c757d"; // Set the text color for the unit
-
-                    ctx.fillText(unitText, width / 2, height / 1.2); // Adjust the vertical position of the unit
-                    ctx.save();
-                }
-
+                
                 // Function to fetch updated data from the server
                 function fetchData() {
                     $.ajax({
@@ -166,7 +137,8 @@
                         type: 'GET',
                         dataType: 'json',
                         success: function (data) {
-                            UpdatePressChartChart(data);
+                            UpdatePressChartChart(data.liveData);
+                            SetChartLineHistory(data.historyData);
                             oTable.ajax.reload(null, false);
                         },
                         error: function (error) {
@@ -212,21 +184,26 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        scales: {
-                            xAxes: [{
+                        scales: {                                
+                            xAxes: [
+                                {
                                 display: true,
                                 scaleLabel: {
                                     display: true,
                                     labelString: 'Timestamp'
                                 }
                             }],
-                            yAxes: [{
-                                display: true,
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'Pressure Value'
-                                }
-                            }]
+                            yAxes: [
+                                {
+                                    ticks: {
+                                        max: 30, // Set your desired maximum value here
+                                        beginAtZero: true, // If you want the scale to start from zero
+                                        
+                                    }, scaleLabel: {
+                                        display: true,
+                                        labelString: 'Pressure Value'
+                                    }
+                                }]
                         },
                         plugins: {
                             centerText: false   // disable plugin 'p1' for this instance
@@ -234,7 +211,30 @@
                     }
                 });
                 //end data visualization
-
+                // Function to initialize the chart
+                function UpdatePressChartChart(value){
+                    press.data.datasets[0].data = [value, 10 - value];
+                    press.update();
+                }
+                //set to Hiscorical Data
+                function SetChartLineHistory(history) {
+                    // Extract data from table rows
+                    var dataLabels = [];
+                    var dataValues = [];
+                    for (var i = 0; i < history.length; i++) {
+                        var row = history[i];
+                        var cells = row;
+                        var value = parseFloat(cells.pressure);
+                        if (!isNaN(value)) { // Skip null or empty values
+                            dataValues.push(value);
+                            dataLabels.push(cells.timeStamp);
+                        }
+                    }
+                    dataVisualization.data.datasets[0].data = dataValues;
+                    dataVisualization.data.labels = dataLabels;
+                    console.log(dataValues);
+                    dataVisualization.update();
+                }
             }); //end Document
 
         </script>
