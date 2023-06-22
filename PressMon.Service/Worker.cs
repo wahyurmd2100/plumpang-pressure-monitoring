@@ -13,6 +13,7 @@ namespace PressMon.Service
         private readonly SensorConfig _sensorConfig;
         private ModbusManagerLib.ModbusManager _modbusManager;
         private readonly string _serverAddress;
+        private string apiAddress = "/api/PostData";
         public Worker(ILogger<Worker> logger, SensorConfig sensorConfig, string serverAddress)
         {
             _logger = logger;
@@ -20,7 +21,7 @@ namespace PressMon.Service
             _modbusManager = new ModbusManagerLib.ModbusManager();
             _modbusManager.IPAddress = _sensorConfig.IpAddress;
             _modbusManager.Port = _sensorConfig.Port;
-            _serverAddress = serverAddress;
+            _serverAddress = serverAddress+apiAddress;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -33,8 +34,8 @@ namespace PressMon.Service
                     _modbusManager.Connect();
                     foreach (var sensor in _sensorConfig.Sensors)
                     {
-
-                        int address = sensor.Address - 40001;
+                        
+                        int address = sensor.Address - 40001; //kenapa dikurang 40001 karena kalau di library madbus pakainya array bukan alamat register. 
                         int[] values = _modbusManager.ReadHoldingRegisters(address, 2);
                         sensor.Value = ModbusManagerLib.ModbusManager.ConvertRegistersToFloat(values, ModbusManagerLib.ModbusManager.RegisterOrder.HighLow);
                         var json = JsonSerializer.Serialize(sensor);
