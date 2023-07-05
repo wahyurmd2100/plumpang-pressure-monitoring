@@ -42,9 +42,9 @@ namespace PressMon.Service
                     foreach (var sensor in _sensorConfig.Sensors)
                     {
                         
-                        int address = sensor.Address - 40001; //kenapa dikurang 40001 karena kalau di library madbus pakainya array bukan alamat register. 
-                        int[] values = _modbusManager.ReadHoldingRegisters(address, 2);
-                        sensor.Value = ModbusManagerLib.ModbusManager.ConvertRegistersToFloat(values, ModbusManagerLib.ModbusManager.RegisterOrder.HighLow);
+                        int address = sensor.Address - 30001; //kenapa dikurang 40001 karena kalau di library madbus pakainya array bukan alamat register. 
+                        int[] values = _modbusManager.ReadInputRegisters(address, 1);
+                        sensor.Value = (float)values[0] / 1000;
                         var json = JsonSerializer.Serialize(sensor);
                         _logger.LogInformation("Worker running at: {time} , Data ={0}", DateTimeOffset.Now, json);
                     }
