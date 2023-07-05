@@ -4,6 +4,7 @@ using ModbusManagerLib;
 using ModbusManagerLib;
 using System.Text;
 using System;
+using FluentModbus;
 
 namespace PressMon.Service
 {
@@ -13,7 +14,7 @@ namespace PressMon.Service
         private readonly SensorConfig _sensorConfig;
         private ModbusManagerLib.ModbusManager _modbusManager;
         private readonly string _serverAddress;
-        private string apiAddress = "/api/PostData";
+        private ModbusTcpServer _tcpServer;
         public Worker(ILogger<Worker> logger, SensorConfig sensorConfig, string serverAddress)
         {
             _logger = logger;
@@ -21,12 +22,18 @@ namespace PressMon.Service
             _modbusManager = new ModbusManagerLib.ModbusManager();
             _modbusManager.IPAddress = _sensorConfig.IpAddress;
             _modbusManager.Port = _sensorConfig.Port;
-            _serverAddress = serverAddress+apiAddress;
+            _serverAddress = serverAddress;
+            _tcpServer = new ModbusTcpServer();
+            _tcpServer.Start();
         }
-
+        /// <summary>
+        /// Excute 
+        /// </summary>
+        /// <param name="stoppingToken"></param>
+        /// <returns></returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
@@ -43,6 +50,7 @@ namespace PressMon.Service
                     }
                     _modbusManager.Disconnect();
                     PostData(_serverAddress, _sensorConfig.Sensors);
+                    SetModbusMaster(_sensorConfig.Sensors);
                 }
                 catch (Exception ex)
                 {
@@ -51,10 +59,16 @@ namespace PressMon.Service
                 await Task.Delay(_sensorConfig.TimeLoop, stoppingToken);
             }
         }
+        /// <summary>
+        /// Post Data to Server
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="sensors"></param>
         private async void PostData(string url, List<Sensor> sensors)
         {
             HttpClient client = new HttpClient();
-            foreach(Sensor sensor in sensors)
+            
+            foreach (Sensor sensor in sensors)
             {
                 try
                 {
@@ -67,6 +81,7 @@ namespace PressMon.Service
 
                     // Post to the endpoint
                     var response = await client.PostAsync(url, content);
+
                 }
                 catch(Exception ex)
                 {
@@ -75,6 +90,33 @@ namespace PressMon.Service
                 
             }
         }
-        
+        private void SetModbusMaster(List<Sensor> sensors)
+        {
+            Span<short> registers = _tcpServer.GetHoldingRegisters();
+            int Address = 10;
+            lock (_tcpServer.Lock)
+            {
+                foreach (Sensor sensor in sensors)
+                {
+                    float value =(float) Math.Round(sensor.Value, 2);
+                    registers.SetLittleEndian<float>(address: Address, setValue(value));
+                    _tcpServer.Update();
+                    Address += 2;
+
+                }
+            }
+        }
+        private float setValue(double data)
+        {
+            float value = (float)data;
+            byte[] Arry = BitConverter.GetBytes(value);
+            byte[] xArry = new byte[4];
+            xArry[0] = Arry[1];
+            xArry[1] = Arry[0];
+            xArry[2] = Arry[3];
+            xArry[3] = Arry[2];
+            return BitConverter.ToSingle(xArry, 0);
+        }
+
     }
 }
