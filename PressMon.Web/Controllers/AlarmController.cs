@@ -57,11 +57,18 @@ namespace TMS.Web.Controllers
         }
         private static string UnixTimeStampToDateTime(int unixTimeStamp)
         {
-            // Convert Unix timestamp to DateTimeOffset
-
+            // Convert Unix timestamp to DateTimeOffset            
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds((long)unixTimeStamp);
-            // Convert DateTimeOffset to desired datetime string format
-            string datetimeString = dateTimeOffset.ToString("yyyy-MM-dd HH:mm:ss");
+
+            // Get the Jakarta time zone
+            TimeZoneInfo jakartaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Jakarta");
+
+            // Convert the DateTimeOffset to Jakarta time
+            DateTimeOffset jakartaDateTimeOffset = TimeZoneInfo.ConvertTime(dateTimeOffset, jakartaTimeZone);
+
+            // Convert the DateTimeOffset to the desired datetime string format
+            string datetimeString = jakartaDateTimeOffset.ToString("yyyy-MM-dd HH:mm:ss");
+
             return datetimeString;
         }
     }
