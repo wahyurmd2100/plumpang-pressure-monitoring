@@ -9,63 +9,90 @@
         <script type="text/javascript" asp-append-version="true">
             var oTable;
             $(document).ready(function () {
-                oTable = $('#tb-historical').DataTable(
-                    {
-                        "serverSide": true, // for process server side
-                        "scrollY": true,
-                        "scrollX": true,
-                        "autoWidth": false,
-                        "scrollCollapse": true,
-                        "paging": true,
-                        "fixedColumns": true,
-                        "processing": true,
-                        "ajax": {
-                            "url": "@Url.Action("LoadData")",
-                            "type": "POST",
-                            "datatype": "json"
-                        },
-                        "columnDefs": [{
-                            "targets": 0,
-                            "visible": false,
-                            "searchable": false
-                        }],
-                        "columns": [
-                            { "data": "historicalID", "name": "HistoricalID", "autoWidth": true },
-                            { "data": "locationName", "name": "LocationName", "autoWidth": true },
-                            { "data": "pressure", "name": "Pressure", "autoWidth": true },
-                            { "data": "timeStamp", "name": "TimeStamp", "autoWidth": true },
-                         ]
-                    }
-                );
-            });//end document ready
+                // Populate select options
+                var dataInterval = document.getElementById("dataInterval");
+                var dataOptions = ["Seconds", "Minutes", "Hours"];
+                for (var i = 0; i < dataOptions.length; i++) {
+                    var option = document.createElement("option");
+                    option.value = dataOptions[i];
+                    option.text = dataOptions[i];
+                    dataInterval.appendChild(option);
+                }
+
+                // Initialize DataTable
+                oTable = $('#tb-historical').DataTable({
+                    "serverSide": true, // for process server side
+                    "scrollY": true,
+                    "scrollX": true,
+                    "autoWidth": false,
+                    "scrollCollapse": true,
+                    "paging": true,
+                    "fixedColumns": true,
+                    "processing": true,
+                    "ajax": {
+                        "url": "@Url.Action("LoadData")",
+                        "type": "POST",
+                        "datatype": "json"
+                    },
+                    "columnDefs": [{
+                        "targets": 0,
+                        "visible": false,
+                        "searchable": false
+                    }],
+                    "columns": [
+                        { "data": "historicalID", "name": "HistoricalID", "autoWidth": true },
+                        { "data": "locationName", "name": "LocationName", "autoWidth": true },
+                        { "data": "pressure", "name": "Pressure", "autoWidth": true },
+                        { "data": "timeStamp", "name": "TimeStamp", "autoWidth": true },
+                    ]
+                });
+
+                // Filter the table when the select value changes
+                $("#dataInterval").on("change", function () {
+                    var selectedValue = $(this).val();
+                    oTable.columns(3).search(selectedValue).draw();
+                });
+            });
+
         </script>
     }
-    </head>
-    <!-- Begin Page Content -->
-    <div class="container-fluid" style="width: 100%;">
+</head>
+<!-- Begin Page Content -->
+<div class="container-fluid" style="width: 100%;">
 
-        <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Historical List</h1>
-            <a value="reload" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
-                <i class="fas fa-redo-alt"></i>
-            </a>
-        </div>
-
-        <!-- Submain Content -->
-        <div class="card shadow-lg rounded" style="font-size:12px;">
-            <div class="card-header bg-gradient-info p-1"></div>
-            <div class="card-body">
-                <!-- Divider -->
-                <hr class="sidebar-divider my-3">
-
-                <!-- Tank Table -->
-                @await Html.PartialAsync("_ViewAll", Model)
-                <!-- End Tank table -->
-
-            </div>
-        </div>
-        <!-- End Submain Content -->
-
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Historical List</h1>
+        <a value="reload" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
+            <i class="fas fa-redo-alt"></i>
+        </a>
     </div>
-    <!-- End Page Content -->
+
+    <!-- Submain Content -->
+    <div class="card shadow-lg rounded" style="font-size:12px;">
+        <div class="card-header bg-gradient-info p-1"></div>
+        <div class="card-body">
+
+            <!-- Filter -->
+            <form>
+                <div class="form-row">
+                    <div class="form-group col-md-2">
+                        <label for="dataInterval">Data Interval</label>
+                        <select id="dataInterval" class="form-control custom-select custom-select-sm"></select>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider mt-0">
+
+            <!-- Tank Table -->
+            @await Html.PartialAsync("_ViewAll", Model)
+            <!-- End Tank table -->
+
+        </div>
+    </div>
+    <!-- End Submain Content -->
+
+</div>
+<!-- End Page Content -->

@@ -12,7 +12,7 @@
 
             //ready document
             $(document).ready(function () {
-                //table record data
+                ////////////////////////////////////// end datatable //////////////////////////////////////
                 var oTable = $('#tb-record').DataTable(
                     {
                         "searching": false,
@@ -44,7 +44,9 @@
                             { "data": "timeStamp", "name": "TimeStamp", "autoWidth": true },
                         ]
                     }
-                ); //end datatable
+                );
+
+                ////////////////////////////////////// end datatable //////////////////////////////////////
 
                 //pressure live data
                 var press = null;
@@ -211,6 +213,7 @@
                     }
                 });
                 //end data visualization
+
                 // Function to initialize the chart
                 function UpdatePressChartChart(value){
                     press.data.datasets[0].data = [value, 10 - value];
@@ -254,12 +257,14 @@
     </div>
 
     <!-- Dashboard -->
+
+    <!-- Start Row PT-01 -->
     <div class="row g-2">
         <div class="col-4">
             <div class="card h-100 d-flex flex-column shadow-lg rounded">
                 <div class="card-header bg-gradient-info p-1"></div>
                 <div class="card-body">
-                    <h5 class="card-title">Pressure (Bar)</h5>
+                    <h5 class="card-title">PT-01</h5>
                     <div class="my-auto" style="position:relative">
                         <canvas id="press"></canvas>
                         <canvas id="gaugeView" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></canvas>
@@ -283,6 +288,7 @@
             </div>
         </div>
     </div>
+    <!-- End Row PT-01 -->
 
 
     <div class="row my-4">

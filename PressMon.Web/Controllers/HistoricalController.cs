@@ -30,18 +30,23 @@ namespace TMS.Web.Controllers
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int recordsTotal = 0;
 
-                //get all data
-                var historicals = (from p in _context.Historicals select new
+
+                // Get all data from the database
+                var historicals = _context.Historicals.ToList().Select(p => new
                 {
                     p.HistoricalID,
                     p.LocationName,
                     p.Pressure,
                     TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
-                }).OrderBy(t=>t.HistoricalID).Reverse();
+                }).OrderBy(t => t.HistoricalID).Reverse();
 
-                
+                // Search  
+                if (!string.IsNullOrEmpty(searchValue))
+                {
+                    historicals = historicals.Where(m => m.TimeStamp.Contains(searchValue));
+                }
 
-                //total number of rows counts   
+                // Total number of rows counts   
                 recordsTotal = historicals.Count();
                 //Paging   
                 var data = historicals.Skip(skip).Take(pageSize).ToList();
@@ -69,5 +74,23 @@ namespace TMS.Web.Controllers
 
             return datetimeString;
         }
+
+        private static int DateTimeToUnixTimeStamp(string dateTimeString)
+        {
+            // Parse the datetime string
+            DateTime dateTime = DateTime.Parse(dateTimeString);
+
+            // Get the Jakarta time zone
+            TimeZoneInfo jakartaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Jakarta");
+
+            // Convert DateTime to DateTimeOffset in Jakarta time
+            DateTimeOffset jakartaDateTimeOffset = new DateTimeOffset(dateTime, jakartaTimeZone.GetUtcOffset(dateTime));
+
+            // Convert Jakarta DateTimeOffset to Unix timestamp
+            int unixTimeStamp = (int)jakartaDateTimeOffset.ToUnixTimeSeconds();
+
+            return unixTimeStamp;
+        }
+
     }
 }
