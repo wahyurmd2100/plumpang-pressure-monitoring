@@ -30,8 +30,8 @@ namespace PressMon.Web.Controllers
         }
         public IActionResult GetLiveData()
         {
-            var data = _context.LiveDatas.FirstOrDefault(x => x.LocationName == "M-01").Pressure;
-            var charHistory = (from p in _context.Historicals select p).OrderByDescending(t=>t.HistoricalID).Take(20).OrderBy(t => t.TimeStamp).ToList();
+            var data = _context.LiveDatas.ToList();
+            var charHistory = (from p in _context.Historicals select p).OrderByDescending(t => t.HistoricalID).Take(20).OrderBy(t => t.TimeStamp).ToList();
             var result = from c in charHistory
                          select new
                          {
@@ -39,9 +39,11 @@ namespace PressMon.Web.Controllers
                              TimeStamp = UnixTimeStampToDateTime(c.TimeStamp)
                          };
 
-            
+
             return Json(new { liveData = data, HistoryData = result });
         }
+
+
         public IActionResult GetAlarm()
         {
             var data = _context.LiveDatas.FirstOrDefault(x => x.LocationName == "M-01").Pressure;

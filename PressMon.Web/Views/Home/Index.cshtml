@@ -48,15 +48,21 @@
 
                 ////////////////////////////////////// end datatable //////////////////////////////////////
 
-                //pressure live data
-                var press = null;
-                var gaugeView = null;
+                ////////////////////////////////////// start pressure1 live data //////////////////////////////////////
+                var pressPT01 = null;
+                var pressPT02 = null;
+                var gaugeViewPT01 = null;
+                var gaugeViewPT02 = null;
 
                 //start current data
-                var pressCanvas = document.getElementById('press');
-                var pressCtx = pressCanvas.getContext('2d');
-                var gaugeViewCtx = document.getElementById('gaugeView').getContext('2d');
-                //
+                var pressCanvasPT01 = document.getElementById('pressPT01');
+                var pressCanvasPT02 = document.getElementById('pressPT02');
+                var pressCtxPT01 = pressCanvasPT01.getContext('2d');
+                var pressCtxPT02 = pressCanvasPT02.getContext('2d');
+                var gaugeViewCtxPT01 = document.getElementById('gaugeViewPT01').getContext('2d');
+                var gaugeViewCtxPT02 = document.getElementById('gaugeViewPT02').getContext('2d');
+                
+
                 var pressOptions = {
                     responsive: true,
                     cutoutPercentage: 70, // Adjust this value to control the size of the center hole
@@ -78,8 +84,20 @@
                         }
                     }
                 };
+
                 //gauge pressure
-                const pressConfig = {
+                const pressConfigPT01 = {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Current Pressure'],
+                        datasets: [{
+                            data: [0, 10 - 0],
+                            backgroundColor: ['#36b9cc', 'rgba(0, 0, 0, 0)'],
+                        }]
+                    },
+                    options: pressOptions
+                };
+                const pressConfigPT02 = {
                     type: 'doughnut',
                     data: {
                         labels: ['Current Pressure'],
@@ -127,20 +145,37 @@
                 };
 
                 //Initial chart
-                press = new Chart(pressCtx, pressConfig);
-                console.log(press);
-                gaugeView = new Chart(gaugeViewCtx, alarmConfig);
+                pressPT01 = new Chart(pressCtxPT01, pressConfigPT01);
+                pressPT02 = new Chart(pressCtxPT02, pressConfigPT02);
+                gaugeViewPT01 = new Chart(gaugeViewCtxPT01, alarmConfig);
+                gaugeViewPT02 = new Chart(gaugeViewCtxPT02, alarmConfig);
+                //console.log(press);
 
-                
+
+
+                // Function to initialize the chart
+                function UpdatePressChart(result) {
+                    pressPT01.data.datasets[0].data = [result[0].pressure, 10 - result[0].pressure];
+                    pressPT01.update();
+                    pressPT02.data.datasets[0].data = [result[1].pressure, 10 - result[1].pressure];
+                    pressPT02.update();
+                    console.log(result);
+
+                }
+
+                ////////////////////////////////////// end pressure1 live data //////////////////////////////////////
+
                 // Function to fetch updated data from the server
                 function fetchData() {
                     $.ajax({
                         url: '@Url.Action("GetLiveData","Home")',
                         type: 'GET',
                         dataType: 'json',
-                        success: function (data) {
-                            UpdatePressChartChart(data.liveData);
-                            SetChartLineHistory(data.historyData);
+                        success: function (result) {
+
+
+                            UpdatePressChart(result.liveData);
+                            SetChartLineHistory(result.historyData);
                             oTable.ajax.reload(null, false);
                         },
                         error: function (error) {
@@ -152,9 +187,51 @@
                 setInterval(fetchData, 1000);
 
 
-                ////end current data
 
-                //start data visualization
+
+
+
+
+
+
+
+
+
+
+
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                ////////////////////////////////////// start data visualization //////////////////////////////////////
                 var tableRows = document.querySelectorAll(".table tbody tr"); // Get the table rows
 
                 // Extract data from table rows
@@ -212,13 +289,7 @@
                         }
                     }
                 });
-                //end data visualization
 
-                // Function to initialize the chart
-                function UpdatePressChartChart(value){
-                    press.data.datasets[0].data = [value, 10 - value];
-                    press.update();
-                }
                 //set to Hiscorical Data
                 function SetChartLineHistory(history) {
                     // Extract data from table rows
@@ -235,9 +306,17 @@
                     }
                     dataVisualization.data.datasets[0].data = dataValues;
                     dataVisualization.data.labels = dataLabels;
-                    console.log(dataValues);
+                    //console.log(dataValues);
                     dataVisualization.update();
                 }
+
+                ////////////////////////////////////// end data visualization //////////////////////////////////////
+
+                
+
+                
+
+                
             }); //end Document
 
         </script>
@@ -258,21 +337,40 @@
 
     <!-- Dashboard -->
 
-    <!-- Start Row PT-01 -->
+    
     <div class="row g-2">
-        <div class="col-4">
+        <!-------------------------------- Start PT-01 -------------------------------->
+        <div class="col-3">
             <div class="card h-100 d-flex flex-column shadow-lg rounded">
                 <div class="card-header bg-gradient-info p-1"></div>
                 <div class="card-body">
                     <h5 class="card-title">PT-01</h5>
                     <div class="my-auto" style="position:relative">
-                        <canvas id="press"></canvas>
-                        <canvas id="gaugeView" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></canvas>
+                        <canvas id="pressPT01"></canvas>
+                        <canvas id="gaugeViewPT01" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-8">
+        <!-------------------------------- End PT-01 -------------------------------->
+
+        <!-------------------------------- Start PT-02 -------------------------------->
+        <div class="col-3">
+            <div class="card h-100 d-flex flex-column shadow-lg rounded">
+                <div class="card-header bg-gradient-info p-1"></div>
+                <div class="card-body">
+                    <h5 class="card-title">PT-02</h5>
+                    <div class="my-auto" style="position:relative">
+                        <canvas id="pressPT02"></canvas>
+                        <canvas id="gaugeViewPT02" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-------------------------------- End PT-02 -------------------------------->
+
+        <!-------------------------------- Start Table -------------------------------->
+        <div class="col-6">
             <div class="card shadow-lg rounded h-100">
                 <div class="card-header bg-gradient-info p-1"></div>
                 <div class="card-body">
@@ -287,8 +385,11 @@
                 </div>
             </div>
         </div>
+        <!-------------------------------- End Table -------------------------------->
     </div>
-    <!-- End Row PT-01 -->
+    
+
+
 
 
     <div class="row my-4">
