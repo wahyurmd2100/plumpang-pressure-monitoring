@@ -61,7 +61,7 @@
                 var pressCtxPT02 = pressCanvasPT02.getContext('2d');
                 var gaugeViewCtxPT01 = document.getElementById('gaugeViewPT01').getContext('2d');
                 var gaugeViewCtxPT02 = document.getElementById('gaugeViewPT02').getContext('2d');
-                
+
 
                 var pressOptions = {
                     responsive: true,
@@ -159,77 +159,11 @@
                     pressPT01.update();
                     pressPT02.data.datasets[0].data = [result[1].pressure, 10 - result[1].pressure];
                     pressPT02.update();
-                    console.log(result);
+                    //console.log(result);
 
                 }
 
                 ////////////////////////////////////// end pressure1 live data //////////////////////////////////////
-
-                // Function to fetch updated data from the server
-                function fetchData() {
-                    $.ajax({
-                        url: '@Url.Action("GetLiveData","Home")',
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (result) {
-
-
-                            UpdatePressChart(result.liveData);
-                            SetChartLineHistory(result.historyData);
-                            oTable.ajax.reload(null, false);
-                        },
-                        error: function (error) {
-                            console.log(error);
-                        }
-                    });
-                }
-                // Refresh the chart at regular intervals
-                setInterval(fetchData, 1000);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                 ////////////////////////////////////// start data visualization //////////////////////////////////////
                 var tableRows = document.querySelectorAll(".table tbody tr"); // Get the table rows
@@ -263,21 +197,21 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        scales: {                                
+                        scales: {
                             xAxes: [
                                 {
-                                display: true,
-                                scaleLabel: {
                                     display: true,
-                                    labelString: 'Timestamp'
-                                }
-                            }],
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'Timestamp'
+                                    }
+                                }],
                             yAxes: [
                                 {
                                     ticks: {
                                         max: 30, // Set your desired maximum value here
                                         beginAtZero: true, // If you want the scale to start from zero
-                                        
+
                                     }, scaleLabel: {
                                         display: true,
                                         labelString: 'Pressure Value'
@@ -306,17 +240,37 @@
                     }
                     dataVisualization.data.datasets[0].data = dataValues;
                     dataVisualization.data.labels = dataLabels;
-                    //console.log(dataValues);
                     dataVisualization.update();
                 }
 
                 ////////////////////////////////////// end data visualization //////////////////////////////////////
 
-                
+                // Function to fetch updated data from the server
+                function fetchData() {
+                    $.ajax({
+                        url: '@Url.Action("GetLiveData","Home")',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (result) {
+                            //console.log(result);
 
-                
 
-                
+                            UpdatePressChart(result.liveData);
+                            SetChartLineHistory(result.historyData);
+                            oTable.ajax.reload(null, false);
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }
+                // Refresh the chart at regular intervals
+                setInterval(fetchData, 1000);
+
+
+
+
+
             }); //end Document
 
         </script>
@@ -337,7 +291,7 @@
 
     <!-- Dashboard -->
 
-    
+
     <div class="row g-2">
         <!-------------------------------- Start PT-01 -------------------------------->
         <div class="col-3">
@@ -353,7 +307,6 @@
             </div>
         </div>
         <!-------------------------------- End PT-01 -------------------------------->
-
         <!-------------------------------- Start PT-02 -------------------------------->
         <div class="col-3">
             <div class="card h-100 d-flex flex-column shadow-lg rounded">
@@ -368,7 +321,6 @@
             </div>
         </div>
         <!-------------------------------- End PT-02 -------------------------------->
-
         <!-------------------------------- Start Table -------------------------------->
         <div class="col-6">
             <div class="card shadow-lg rounded h-100">
@@ -387,7 +339,7 @@
         </div>
         <!-------------------------------- End Table -------------------------------->
     </div>
-    
+
 
 
 

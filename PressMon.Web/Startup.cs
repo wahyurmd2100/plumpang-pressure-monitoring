@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using TMS.Web.Hubs;
-using PressMon.Web.Areas.Identity.Data;
 
 namespace PressMon.Web
 {
@@ -31,19 +30,7 @@ namespace PressMon.Web
         {
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("ContextConnection")));
-            services.AddIdentity<AppUser, AppRole>(options =>
-            {
-                options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireDigit = false;
-                options.SignIn.RequireConfirmedAccount = false;
-            }).AddEntityFrameworkStores<DataContext>()
-            .AddDefaultUI()
-            .AddRoleManager<RoleManager<AppRole>>()
-            .AddDefaultTokenProviders();
-            // Add authorization services Admin
             services.AddControllersWithViews();
-            services.AddAuthorization();
             services.AddSignalR();
    
         }
@@ -59,11 +46,9 @@ namespace PressMon.Web
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-            app.UseRouting();
-            app.UseAuthorization();
-            app.UseAuthentication();
+            app.UseStaticFiles();
 
-            
+            app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {

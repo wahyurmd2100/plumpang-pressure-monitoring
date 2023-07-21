@@ -54,18 +54,7 @@ showInPopup = (url, title) => {
         }
     })
 }
-JQueryLogOut = (url) => {
-    console.log(url);
-    $.ajax({
-        "type": "POST",
-        "url": url,
-        success: function (res) {
-            if (res.isValid) {
-                window.location.href = "/Home/Index";
-            }
-        }
-    })
-}
+
 showInPopupLg = (url, title) => {
     $.ajax({
         type: "GET",
@@ -77,34 +66,7 @@ showInPopupLg = (url, title) => {
         }
     })
 }
-JQueryAjaxLogin = form => {
-    try {
-        $.ajax({
-            type: 'POST',
-            url: form.action,
-            data: new FormData(form),
-            contentType: false,
-            processData: false,
-            success: function (res) {
-                if (res.isValid) {
-                    location.reload();
-                    alert(res.message);
-                    $('#form-modal').modal('close');
-                } else {
-                    alert(res.message);
 
-                }
-            },
-            error: function (err) {
-                console.log(err);
-            }
-        })
-        //to prevent default form submit event
-        return false;
-    } catch (ex) {
-        console.log(ex);
-    }
-}
 jQueryAjaxPost = form => {
     try {
         $.ajax({
@@ -119,6 +81,10 @@ jQueryAjaxPost = form => {
                     $('#view-all').html(res.html);
                     location.reload(true);
                     $('#form-modal').modal('close');
+                //    $('#form-modal-lg').modal('close');
+                //    oTable = $('#tbl-grid').DataTable();
+                //    oTable.ajax.reload(null, false);
+                //    M.toast({ html: 'Record saved successfully' })
                 }
                 else {
                     //if (res.html != '') {
