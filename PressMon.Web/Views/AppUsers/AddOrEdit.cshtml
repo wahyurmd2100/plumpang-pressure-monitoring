@@ -1,0 +1,70 @@
+﻿@model PressMon.Web.Views.AppUsers.Register//ini ngambil modelnnya di model
+@{
+    ViewData["Title"] = "AddOrEdit";
+    Layout = null;
+}
+<form id="form" asp-action="AddOrEdit" asp-route-id="@Model.Id" onsubmit="return jQueryAjaxPost(this);" autocomplete="off">
+    <div class="row">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group col-md-6">
+            <label asp-for="FullName" class="control-label d-flex align-items-center fs-5 fw-semibold mb-2"></label>
+            <input asp-for="FullName" class="form-control form-control-lg form-control-solid" />
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="UserName" class="control-label d-flex align-items-center fs-5 fw-semibold mb-2"></label>
+            <input asp-for="UserName" class="form-control form-control-lg form-control-solid" />
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="Email" class="control-label d-flex align-items-center fs-5 fw-semibold mb-2"></label>
+            <input asp-for="Email" class="form-control form-control-lg form-control-solid" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="RoleName" class="control-label d-flex align-items-center fs-5 fw-semibold mb-2"></label>
+            <select asp-for="RoleName" class="form-control form-control-lg form-control-solid" asp-items=@(new SelectList(ViewBag.RolesId,"Id","Name"))></select>
+            <span asp-validation-for="RoleName" class="text-danger"></span>
+        </div>
+
+        @if (Model.UserName == null)
+        {
+            <div class="form-group col-md-6">
+                <label asp-for="Password" class="control-label d-flex align-items-center fs-5 fw-semibold mb-2"></label>
+                <input asp-for="Password" class="form-control form-control-lg form-control-solid" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="ConfirmPassword" class="control-label d-flex align-items-center fs-5 fw-semibold mb-2"></label>
+                <input asp-for="ConfirmPassword" class="form-control form-control-lg form-control-solid" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+        }
+        else
+        {
+            <div class="form-group col-md-6">
+                <label class="control-label d-flex align-items-center fs-5 fw-semibold mb-2">Current Password</label>
+                <input asp-for="Password" class="form-control form-control-lg form-control-solid" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="NewPassword" class="control-label d-flex align-items-center fs-5 fw-semibold mb-2"></label>
+                <input asp-for="NewPassword" class="form-control form-control-lg form-control-solid" />
+                <span asp-validation-for="NewPassword" class="text-danger"></span>
+            </div>
+
+        }
+        <div class="form-group" class="col text-center">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Discard</button>
+            <button type="submit" class="btn btn-success">Save Changes</button>
+
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
