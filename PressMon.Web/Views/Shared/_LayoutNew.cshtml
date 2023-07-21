@@ -1,5 +1,10 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+@using Microsoft.AspNetCore.Identity
+@using PressMon.Web.Areas.Identity.Data
+
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -68,13 +73,24 @@
                     <span>Configuration</span>
                 </a>
                 <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Settings :</h6>
-                        <a class="collapse-item" asp-area="" asp-controller="AlarmSettings" asp-action="Index">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <span>Alarm Set Point</span>
-                        </a>
-                    </div>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <h6 class="collapse-header">Settings :</h6>
+                            <a class="collapse-item" asp-area="" asp-controller="AlarmSettings" asp-action="Index">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Alarm Set Point</span>
+                            </a>
+                            <a class="collapse-item" asp-area="" asp-controller="AppUsers" asp-action="Index">
+                                <i class="fas fa-users"></i>
+                                User List
+                            </a>
+                            <a class="collapse-item" asp-area="" asp-controller="AppRoles" asp-action="Index">
+                                <i class="fas fa-user-tag"></i>
+                                User Role
+                            </a>
+                        </div>
+                    }
                 </div>
             </li>
 
@@ -95,10 +111,10 @@
 
             <!-- Sidebar Logo Citia -->
             @*<div class="sidebar-card d-none d-lg-flex bg-transparent">
-            <a href="https://citia-engineering.com/">
-            <img src="~/assets/img/citia_logo_putih.png" alt="Citia Engineering" width="90" height="90" class="py-1" />
-            </a>
-            </div>*@
+                    <a href="https://citia-engineering.com/">
+                        <img src="~/assets/img/citia_logo_putih.png" alt="Citia Engineering" width="90" height="90" class="py-1" />
+                    </a>
+                </div>*@
             <!-- End Sidebar Logo Citia -->
         </ul>
         <!-- End Sidebar -->
@@ -128,7 +144,36 @@
                     </li>
                 </ul>
                 <!-- End Alarm Section -->
+                <ul class="navbar-nav ml-auto">
+                    <!-- Nav Item - User Information -->
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">@UserManager.GetUserName(User)</span>
+                            <img class="img-profile rounded-circle" src="~/assets/img/users.svg">
+                        </a>
+                        <!-- Dropdown - User Information -->
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                             aria-labelledby="userDropdown">
+                            @if (string.IsNullOrEmpty(UserManager.GetUserName(User)))
+                            {
+                                <button type="button" class="btn btn-link btn-sm dropdown-item" onclick="showInPopup('@Url.Action("LoginUser","AppUsers", null, Context.Request.Scheme)','Add New User')">
+                                    <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Log In
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-link btn-sm dropdown-item"  onclick="JQueryLogOut('@Url.Action("LogOutUser","AppUsers", null, Context.Request.Scheme)')">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Log Out
+                                </button>
+                            }
 
+                        </div>
+                    </li>
+
+                </ul>
 
             </nav>
             <!-- End of Topbar -->
@@ -154,8 +199,69 @@
         </div>
     </div>
     <partial name="_Scripts" />
-    <div id="baseUrlData" data-base-url="@Url.Action("GetAlarm", "Home")"></div>
-    <script type="text/javascript" src="~/assets/js/currAlarm.js"></script>
+    <script>
+        @*//ready document
+        $(document).ready(function () {
+            var blinkingText = document.getElementById("blinkingText");
+            var press = document.getElementById("press-value");
+            var sound = document.getElementById("sound");
+            var visibleDuration = sound.duration * 1000; // Duration in milliseconds for the visible state
+            var hiddenDuration = visibleDuration / 2; // Duration in milliseconds for the hidden state
+            var blinkInterval; // Variable to store the interval ID
+
+
+            function blinkText() {
+                if (blinkingText.style.visibility === "" || blinkingText.style.visibility === "visible") {
+                    blinkingText.style.visibility = "hidden";
+                    setTimeout(function () {
+                        blinkingText.style.visibility = "visible";
+                        sound.play();
+                    }, hiddenDuration);
+                } else {
+                    blinkingText.style.visibility = "visible";
+                    setTimeout(function () {
+                        blinkingText.style.visibility = "hidden";
+                        sound.pause();
+                        //sound.currentTime = 0;
+                    }, visibleDuration);
+                }
+            }
+            function Disabled() {
+                blinkingText.style.visibility = "hidden";
+                sound.pause();
+                sound.currentTime = 0;
+            }
+            function SettingAlarm() {
+                $.ajax({
+                    url: '@Url.Action("GetAlarm", "Home")',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        var value = data.value;
+                        var alarm = data.alams;
+                        data.alarms.forEach(function (item) {
+                            //console.log(item.info, item.value);
+                            if (item.info == 'H')
+                            {
+                                press.textContent = item.info.toString() + " :" + value.toString() + " Bar";
+                                if (value > item.value) {
+                                    blinkText();
+                                }
+                                else {
+                                    Disabled();
+                                }
+                            }
+                        });
+
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
+            blinkInterval = setInterval(SettingAlarm, visibleDuration + hiddenDuration); // Start the initial blinking interval
+        });*@
+    </script>
     @if (IsSectionDefined("AddToHead"))
     {
         @RenderSection("AddToHead", required: false)

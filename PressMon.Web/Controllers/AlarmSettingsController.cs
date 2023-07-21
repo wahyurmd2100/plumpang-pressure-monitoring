@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PressMon.Web;
 using PressMon.Web.Data;
@@ -71,7 +72,6 @@ namespace TMS.Web.Controllers
                 throw;
             }
         }
-        
         // GET: Banks/AddOrEdit
         [NoDirectAccess]
         public async Task<IActionResult> AddOrEdit(int id = 0)
