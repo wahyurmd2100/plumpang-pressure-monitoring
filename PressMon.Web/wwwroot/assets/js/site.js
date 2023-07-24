@@ -55,13 +55,12 @@ showInPopup = (url, title) => {
     })
 }
 JQueryLogOut = (url) => {
-    console.log(url);
     $.ajax({
         "type": "POST",
         "url": url,
         success: function (res) {
             if (res.isValid) {
-                window.location.href = "/Home/Index";
+                window.location.href = "/PressMon";
             }
         }
     })

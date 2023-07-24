@@ -31,11 +31,12 @@ namespace PressMon.Web.Controllers
         public IActionResult GetLiveData()
         {
             var data = _context.LiveDatas.ToList();
-            var charHistory = (from p in _context.Historicals select p).OrderByDescending(t => t.HistoricalID).Take(20).OrderBy(t => t.TimeStamp).ToList();
+            var charHistory = (from p in _context.Historicals select p).OrderByDescending(t => t.HistoricalID).Take(40).OrderBy(t => t.TimeStamp).ToList();
             var result = from c in charHistory
                          select new
                          {
                              Pressure = c.Pressure,
+                             LocationName = c.LocationName,
                              TimeStamp = UnixTimeStampToDateTime(c.TimeStamp)
                          };
 
@@ -46,7 +47,7 @@ namespace PressMon.Web.Controllers
 
         public IActionResult GetAlarm()
         {
-            var data = _context.LiveDatas.FirstOrDefault(x => x.LocationName == "M-01").Pressure;
+            var data = _context.LiveDatas.ToList();
             var alarms = _context.AlarmSettings.ToList();
             return Json(new { value = data, alarms = alarms });
         }

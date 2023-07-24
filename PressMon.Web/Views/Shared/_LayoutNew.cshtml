@@ -12,7 +12,9 @@
     <partial name="_Styles" />
     <link rel="icon" href="~/assets/img/citia-logo.webp">
     @RenderSection("Styles", required: false)
-
+    <script>
+        var rootUrl = "@Url.Content("~/")";
+    </script>
 </head>
 
 
@@ -199,69 +201,8 @@
         </div>
     </div>
     <partial name="_Scripts" />
-    <script>
-        @*//ready document
-        $(document).ready(function () {
-            var blinkingText = document.getElementById("blinkingText");
-            var press = document.getElementById("press-value");
-            var sound = document.getElementById("sound");
-            var visibleDuration = sound.duration * 1000; // Duration in milliseconds for the visible state
-            var hiddenDuration = visibleDuration / 2; // Duration in milliseconds for the hidden state
-            var blinkInterval; // Variable to store the interval ID
-
-
-            function blinkText() {
-                if (blinkingText.style.visibility === "" || blinkingText.style.visibility === "visible") {
-                    blinkingText.style.visibility = "hidden";
-                    setTimeout(function () {
-                        blinkingText.style.visibility = "visible";
-                        sound.play();
-                    }, hiddenDuration);
-                } else {
-                    blinkingText.style.visibility = "visible";
-                    setTimeout(function () {
-                        blinkingText.style.visibility = "hidden";
-                        sound.pause();
-                        //sound.currentTime = 0;
-                    }, visibleDuration);
-                }
-            }
-            function Disabled() {
-                blinkingText.style.visibility = "hidden";
-                sound.pause();
-                sound.currentTime = 0;
-            }
-            function SettingAlarm() {
-                $.ajax({
-                    url: '@Url.Action("GetAlarm", "Home")',
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        var value = data.value;
-                        var alarm = data.alams;
-                        data.alarms.forEach(function (item) {
-                            //console.log(item.info, item.value);
-                            if (item.info == 'H')
-                            {
-                                press.textContent = item.info.toString() + " :" + value.toString() + " Bar";
-                                if (value > item.value) {
-                                    blinkText();
-                                }
-                                else {
-                                    Disabled();
-                                }
-                            }
-                        });
-
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                });
-            }
-            blinkInterval = setInterval(SettingAlarm, visibleDuration + hiddenDuration); // Start the initial blinking interval
-        });*@
-    </script>
+    
+    <script type="text/javascript" src="~/assets/js/currAlarm.js"></script>
     @if (IsSectionDefined("AddToHead"))
     {
         @RenderSection("AddToHead", required: false)
