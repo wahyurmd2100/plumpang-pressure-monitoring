@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System;
 using System.Net.Http.Headers;
 using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml.InkML;
 
 namespace PressMon.Web.Controllers
 {
@@ -63,6 +64,8 @@ namespace PressMon.Web.Controllers
             int skip = start != null ? Convert.ToInt32(start) : 0;
             int recordsTotal = 0;
 
+            string timeInterval = Request.Form["columns[0][search][value]"].FirstOrDefault();
+
             var liveDatas = (from p in _context.Historicals select p).OrderBy(x => x).Reverse();
             var Datas = from p in liveDatas
                         select new
@@ -72,6 +75,24 @@ namespace PressMon.Web.Controllers
                             p.Pressure,
                             TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
                         };
+
+
+            if (timeInterval == "Minutes")
+            {
+                // Group data by time interval
+                var groupedData = Datas.GroupBy(model => new { model.TimeStamp.Year, model.TimeStamp.Month, model.TimeStamp.Day, model.TimeStamp.Hour, model.TimeStamp.Minute })
+                    .Select(group => new
+                    {
+                        Minute = new DateTime(group.Key.Year, group.Key.Month, group.Key.Day, group.Key.Hour, group.Key.Minute, 0),
+                        Models = group.ToList()
+                    })
+                    .ToList();
+
+                // Flatten the grouped data and convert to IQueryable
+                Datas = groupedData.SelectMany(group => group.Models).AsQueryable();
+            }
+
+
             //total number of rows counts
             recordsTotal = Datas.Count();
             //paging
@@ -79,7 +100,7 @@ namespace PressMon.Web.Controllers
             return Json(new { draw = draw, recordsFilterd = recordsTotal, recordsTotal = recordsTotal, data = data });
 
         }
-        private static string UnixTimeStampToDateTime(int unixTimeStamp)
+        private static DateTime UnixTimeStampToDateTime(int unixTimeStamp)
         {
             // Convert Unix timestamp to DateTimeOffset            
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds((long)unixTimeStamp);
@@ -91,11 +112,9 @@ namespace PressMon.Web.Controllers
             DateTimeOffset jakartaDateTimeOffset = TimeZoneInfo.ConvertTime(dateTimeOffset, jakartaTimeZone);
 
             // Convert the DateTimeOffset to the desired datetime string format
-            string datetimeString = jakartaDateTimeOffset.ToString("yyyy-MM-dd HH:mm:ss");
+            //string datetimeString = jakartaDateTimeOffset.ToString("yyyy-MM-dd HH:mm:ss");
 
-            return datetimeString;
+            return jakartaDateTimeOffset.DateTime;
         }
-
-
     }
 }

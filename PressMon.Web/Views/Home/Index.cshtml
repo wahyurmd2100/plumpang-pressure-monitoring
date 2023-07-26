@@ -13,8 +13,7 @@
             //ready document
             $(document).ready(function () {
                 ////////////////////////////////////// end datatable //////////////////////////////////////
-                var oTable = $('#tb-record').DataTable(
-                    {
+                var oTable = $('#tb-record').DataTable({
                         "searching": false,
                         "lengthChange": false,  // Disable the "Show entries" dropdown
                         "pageLength": 5,      // Set the default number of entries displayed to 10
@@ -30,7 +29,13 @@
                         "ajax": {
                             "url": "@Url.Action("GetDataRecord","Home")",
                             "type": "POST",
-                            "datatype": "json"
+                            "datatype": "json",
+                            "data" : function (d){
+                                d.columns[0].search.value = $('#input-time-interval').val();
+                            },
+                            //"success" : function (a){
+                            //    console.log(a);
+                            //}
                         },
                         "columnDefs": [{
                             "targets": 0,
@@ -165,72 +170,6 @@
 
                 ////////////////////////////////////// end pressure1 live data //////////////////////////////////////
 
-                // Function to fetch updated data from the server
-                function fetchData() {
-                    $.ajax({
-                        url: '@Url.Action("GetLiveData","Home")',
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (result) {
-
-
-                            UpdatePressChart(result.liveData);
-                            SetChartLineHistory(result.historyData);
-                            oTable.ajax.reload(null, false);
-                        },
-                        error: function (error) {
-                            console.log(error);
-                        }
-                    });
-                }
-                // Refresh the chart at regular intervals
-                setInterval(fetchData, 1000);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 ////////////////////////////////////// start data visualization //////////////////////////////////////
                 var tableRows = document.querySelectorAll(".table tbody tr"); // Get the table rows
 
@@ -248,77 +187,118 @@
                 }
 
                 // Create the line chart
-                var ctx = document.getElementById('dataVisualization').getContext('2d');
-                var dataVisualization = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: dataLabels,
-                        datasets: [{
-                            label: 'Pressure Value',
-                            data: dataValues,
-                            borderColor: '#36b9cc',
-                            fill: false
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {                                
-                            xAxes: [
-                                {
+                var chartOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        xAxes: [
+                            {
                                 display: true,
                                 scaleLabel: {
                                     display: true,
-                                    labelString: 'Timestamp'
+                                    //labelString: 'Timestamp'
                                 }
                             }],
-                            yAxes: [
-                                {
-                                    ticks: {
-                                        max: 30, // Set your desired maximum value here
-                                        beginAtZero: true, // If you want the scale to start from zero
-                                        
-                                    }, scaleLabel: {
-                                        display: true,
-                                        labelString: 'Pressure Value'
-                                    }
-                                }]
-                        },
-                        plugins: {
-                            centerText: false   // disable plugin 'p1' for this instance
-                        }
+                        yAxes: [
+                            {
+                                ticks: {
+                                    beginAtZero: true, // If you want the scale to start from zero
+                                }, scaleLabel: {
+                                    display: true,
+                                    labelString: 'Pressure Value'
+                                }
+                            }]
+                    },
+                    plugins: {
+                        centerText: false   // disable plugin 'p1' for this instance
                     }
+                };
+
+                var ctxM01 = document.getElementById('dataVisualizationM01').getContext('2d');
+                var dataVisualizationM01 = new Chart(ctxM01, {
+                    type: 'line',
+                    data: {
+                        labels: dataLabels,
+                        datasets: [
+                            {
+                                label: 'Pressure Value (M-01)',
+                                data: dataValues,
+                                borderColor: '#36b9cc',
+                                fill: false
+                            }]
+                    },
+                    options: chartOptions
                 });
 
-                //set to Hiscorical Data
+                var ctxM02 = document.getElementById('dataVisualizationM02').getContext('2d');
+                var dataVisualizationM02 = new Chart(ctxM02, {
+                    type: 'line',
+                    data: {
+                        labels: dataLabels, // You can use the same labels for both charts
+                        datasets: [{
+                            label: 'Pressure Value (M-02)',
+                            data: [], // Add data for the second line here
+                            borderColor: '#ff6384', // You can change the color if needed
+                            fill: false
+                        }]
+                    },
+                    options: chartOptions
+                });
+
                 function SetChartLineHistory(history) {
-                    // Extract data from table rows
-                    var dataLabels = [];
-                    var dataValues = [];
+                    var dataM01Labels = [];
+                    var dataM01Values = [];
+                    var dataM02Labels = [];
+                    var dataM02Values = [];
+
                     for (var i = 0; i < history.length; i++) {
                         var row = history[i];
                         var cells = row;
                         var value = parseFloat(cells.pressure);
-                        if (!isNaN(value)) { // Skip null or empty values
-                            dataValues.push(value);
-                            dataLabels.push(cells.timeStamp);
+                        if (!isNaN(value)) {
+                            if (cells.locationName == 'M-01') {
+                                dataM01Values.push(value);
+                                dataM01Labels.push(cells.timeStamp);
+                            } else if (cells.locationName == 'M-02') {
+                                dataM02Values.push(value);
+                                dataM02Labels.push(cells.timeStamp);
+                            }
                         }
                     }
-                    dataVisualization.data.datasets[0].data = dataValues;
-                    dataVisualization.data.labels = dataLabels;
-                    //console.log(dataValues);
-                    dataVisualization.update();
+
+                    // Update the datasets with the new data
+                    dataVisualizationM01.data.datasets[0].data = dataM01Values;
+                    dataVisualizationM02.data.datasets[0].data = dataM02Values;
+                    dataVisualizationM01.data.labels = dataM01Labels;
+                    dataVisualizationM02.data.labels = dataM02Labels;
+
+                    dataVisualizationM01.update();
+                    dataVisualizationM02.update();
                 }
 
                 ////////////////////////////////////// end data visualization //////////////////////////////////////
+                // Function to fetch updated data from the server
+                function fetchData() {
 
-                
 
-                
+                    $.ajax({
+                        url: '@Url.Action("GetLiveData","Home")',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (result) {
+                            UpdatePressChart(result.liveData);
+                            SetChartLineHistory(result.historyData);
+                            oTable.ajax.reload(null, false);
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }
+                // Refresh the chart at regular intervals
+                setInterval(fetchData, 1000);
 
-                
             }); //end Document
-
         </script>
     }
 
@@ -374,11 +354,25 @@
             <div class="card shadow-lg rounded h-100">
                 <div class="card-header bg-gradient-info p-1"></div>
                 <div class="card-body">
-                    <h5 class="card-title">
-                        <a class="text-secondary" asp-area="" asp-controller="Historical" asp-action="Index">
-                            Last Record Data
-                        </a>
-                    </h5>
+                    <form>
+                        <div class="row">
+                            <div class="col-8">
+                                <h5 class="card-title">
+                                    <a class="text-secondary" asp-area="" asp-controller="Historical" asp-action="Index">
+                                        Last Record Data
+                                    </a>
+                                </h5>
+                            </div>
+                            <div class="col-4">
+                                <select class="form-control" id="input-time-interval">
+                                    <option value="">---</option>
+                                    <option value="Minutes">Minutes</option>
+                                    <option value="Hours">Hours</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                    
                     <!-- Tank Table -->
                     @await Html.PartialAsync("_ViewAll", Model)
                     <!-- End Tank table -->
@@ -388,21 +382,23 @@
         <!-------------------------------- End Table -------------------------------->
     </div>
     
-
-
-
-
+    <!-------------------------------- Start LineChart -------------------------------->
     <div class="row my-4">
         <div class="col-12">
             <div class="card shadow-lg">
                 <div class="card-header bg-gradient-info p-1"></div>
                 <div class="card-body">
                     <h5 class="card-title">Data Visualization</h5>
-                    <div style="height: 500px">
-                        <canvas id="dataVisualization"></canvas>
+                    <div style="height: 250px">
+                        <canvas id="dataVisualizationM01"></canvas>
                     </div>
+                    <div style="height: 250px">
+                        <canvas id="dataVisualizationM02"></canvas>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
+    <!-------------------------------- Start LineChart -------------------------------->
 </div>
