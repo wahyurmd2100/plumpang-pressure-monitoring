@@ -3,6 +3,11 @@ using PressMon.Web.Data;
 using System.Linq;
 using System;
 using System.Linq.Dynamic.Core;
+using System.IO;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel; // Import the XSSF namespace
+using NPOI.HSSF.Record.Chart;
 
 namespace TMS.Web.Controllers
 {
@@ -30,6 +35,10 @@ namespace TMS.Web.Controllers
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int recordsTotal = 0;
 
+                
+                DateTime? DateFrom = string.IsNullOrEmpty(Request.Form["DateFrom"]) ? (DateTime?)null : DateTime.Parse(Request.Form["DateFrom"]);
+                DateTime? DateUntil = string.IsNullOrEmpty(Request.Form["DateUntil"]) ? (DateTime?)null : DateTime.Parse(Request.Form["DateUntil"]);
+                
 
                 // Get all data from the database
                 var historicals = _context.Historicals.ToList().Select(p => new
@@ -40,11 +49,19 @@ namespace TMS.Web.Controllers
                     TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
                 }).OrderBy(t => t.HistoricalID).Reverse();
 
-                // Search  
-                if (!string.IsNullOrEmpty(searchValue))
+                if (DateFrom != null && DateUntil != null)
                 {
-                    historicals = historicals.Where(m => m.TimeStamp.Contains(searchValue));
+                    historicals = historicals.Where(t => t.TimeStamp >= DateFrom && t.TimeStamp <= DateUntil);
                 }
+                else if (DateFrom == null && DateUntil != null)
+                {
+                    historicals = historicals.Where(t => t.TimeStamp <= DateUntil);
+                }
+                else if (DateFrom != null && DateUntil == null)
+                {
+                    historicals = historicals.Where(t => t.TimeStamp >= DateFrom);
+                }
+
 
                 // Total number of rows counts   
                 recordsTotal = historicals.Count();
@@ -58,7 +75,88 @@ namespace TMS.Web.Controllers
                 throw;
             }
         }
-        private static string UnixTimeStampToDateTime(int unixTimeStamp)
+
+        //Distribution Planning Export To Excel 
+        [HttpPost]
+        public IActionResult ExportToExcel(DateTime? DateFrom, DateTime? DateUntil)
+        {
+            try
+            {
+                // Open the template file
+                FileStream templateStream = new FileStream("wwwroot/assets/docTemplate/TemplateHistorical.xlsx", FileMode.Open, FileAccess.Read);
+
+                // Create a new workbook object based on the template file
+                XSSFWorkbook workbook = new XSSFWorkbook(templateStream);
+
+                // Get the sheet you want to write data to
+                ISheet sheet = workbook.GetSheet("Historical");
+
+                // Set Date Export
+                IRow rowDate = sheet.CreateRow(5);
+                rowDate.CreateCell(1).SetCellValue("Date Export : ");
+                rowDate.CreateCell(2).SetCellValue(DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"));
+
+                // Get the data model from your database or other source
+                var historicals = _context.Historicals.ToList().Select(p => new
+                {
+                    p.HistoricalID,
+                    p.LocationName,
+                    p.Pressure,
+                    TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
+                });
+
+                // Filter data based on the selected date range
+                if (DateFrom != null && DateUntil != null)
+                {
+                    historicals = historicals.Where(t => t.TimeStamp >= DateFrom && t.TimeStamp <= DateUntil);
+                }
+                else if (DateFrom == null && DateUntil != null)
+                {
+                    historicals = historicals.Where(t => t.TimeStamp <= DateUntil);
+                }
+                else if (DateFrom != null && DateUntil == null)
+                {
+                    historicals = historicals.Where(t => t.TimeStamp >= DateFrom);
+                }
+
+                // Write the data model to the cells in the sheet
+                int rowIndex = 9;
+                int number = 1;
+                // Start at row 1 (0-based index) to skip the header row
+                foreach (var h in historicals)
+                {
+
+                    IRow row = sheet.CreateRow(rowIndex);
+                    row.CreateCell(0).SetCellValue(number);
+                    row.CreateCell(1).SetCellValue(h.LocationName);
+                    row.CreateCell(2).SetCellValue(h.Pressure);
+                    row.CreateCell(3).SetCellValue(h.TimeStamp.ToString());
+
+                    rowIndex++;
+                    number++;
+                }
+
+                // Save the workbook to a new file
+                MemoryStream stream = new MemoryStream();
+                workbook.Write(stream);
+                stream.Position = 0;
+                FileStreamResult file = new FileStreamResult(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                file.FileDownloadName = "Pressure Transmitter Historical.xlsx";
+
+                // Close the streams
+                templateStream.Close();
+
+                return file;
+            }
+            catch(Exception)
+            {
+                throw;
+            }
+
+            
+        }
+
+        private static DateTime UnixTimeStampToDateTime(int unixTimeStamp)
         {
             // Convert Unix timestamp to DateTimeOffset            
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds((long)unixTimeStamp);
@@ -70,26 +168,9 @@ namespace TMS.Web.Controllers
             DateTimeOffset jakartaDateTimeOffset = TimeZoneInfo.ConvertTime(dateTimeOffset, jakartaTimeZone);
 
             // Convert the DateTimeOffset to the desired datetime string format
-            string datetimeString = jakartaDateTimeOffset.ToString("yyyy-MM-dd HH:mm:ss");
+            //string datetimeString = jakartaDateTimeOffset.ToString("yyyy-MM-dd HH:mm:ss");
 
-            return datetimeString;
-        }
-
-        private static int DateTimeToUnixTimeStamp(string dateTimeString)
-        {
-            // Parse the datetime string
-            DateTime dateTime = DateTime.Parse(dateTimeString);
-
-            // Get the Jakarta time zone
-            TimeZoneInfo jakartaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Jakarta");
-
-            // Convert DateTime to DateTimeOffset in Jakarta time
-            DateTimeOffset jakartaDateTimeOffset = new DateTimeOffset(dateTime, jakartaTimeZone.GetUtcOffset(dateTime));
-
-            // Convert Jakarta DateTimeOffset to Unix timestamp
-            int unixTimeStamp = (int)jakartaDateTimeOffset.ToUnixTimeSeconds();
-
-            return unixTimeStamp;
+            return jakartaDateTimeOffset.DateTime;
         }
 
     }

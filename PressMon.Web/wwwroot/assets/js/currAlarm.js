@@ -20,7 +20,6 @@ $(document).ready(function () {
             setTimeout(function () {
                 blinkingText.style.visibility = "hidden";
                 sound.pause();
-                //sound.currentTime = 0;
             }, visibleDuration);
         }
     }
@@ -92,8 +91,7 @@ $(document).ready(function () {
 
             },
             error: function (error) {
-                console.log(baseUrl);
-                //console.log(error);
+                console.log(error);
             }
         });
     }

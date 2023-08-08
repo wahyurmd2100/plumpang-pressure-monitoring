@@ -6,19 +6,10 @@
 <!-- Begin Page Content -->
 <head>
     @section Scripts{
+        <script src="https://cdn.jsdelivr.net/npm/tableexport@5.2.0/dist/js/tableexport.min.js"></script>
         <script type="text/javascript" asp-append-version="true">
             var oTable;
             $(document).ready(function () {
-                // Populate select options
-                var dataInterval = document.getElementById("dataInterval");
-                var dataOptions = ["Seconds", "Minutes", "Hours"];
-                for (var i = 0; i < dataOptions.length; i++) {
-                    var option = document.createElement("option");
-                    option.value = dataOptions[i];
-                    option.text = dataOptions[i];
-                    dataInterval.appendChild(option);
-                }
-
                 // Initialize DataTable
                 oTable = $('#tb-historical').DataTable({
                     "serverSide": true, // for process server side
@@ -32,7 +23,11 @@
                     "ajax": {
                         "url": "@Url.Action("LoadData")",
                         "type": "POST",
-                        "datatype": "json"
+                        "datatype": "json",
+                        "data": function (d) {
+                            d.DateFrom = document.getElementById("dateFrom").value;
+                            d.DateUntil = document.getElementById("dateUntil").value;
+                        }
                     },
                     "columnDefs": [{
                         "targets": 0,
@@ -47,14 +42,56 @@
                     ]
                 });
 
-                // Filter the table when the select value changes
-                $("#dataInterval").on("change", function () {
-                    var selectedValue = $(this).val();
-                    oTable.columns(3).search(selectedValue).draw();
+                // Create date inputs
+                minDate = new DateTime($('#dateFrom'), {
+                    format: 'D MMMM yyyy HH:mm:ss'
                 });
+                maxDate = new DateTime($('#dateUntil'), {
+                    format: 'D MMMM yyyy HH:mm:ss'
+                });
+
             });
 
+            document.getElementById("btnResetFilter").addEventListener("click", reset);
+            function reset() {
+                document.getElementById("dateFrom").value = "";
+                document.getElementById("dateUntil").value = "";
+                reloadTable();
+            }
+
+            document.getElementById("btnExportToExcel").addEventListener("click", exportToExcel);
+            function exportToExcel() {
+                var dateFrom = document.getElementById("dateFrom").value;
+                var dateUntil = document.getElementById("dateUntil").value;
+
+                $.ajax({
+                    url: '@Url.Action("ExportToExcel")',
+                    method: 'POST',
+                    data: { DateFrom: dateFrom, DateUntil: dateUntil },
+                    xhrFields: {
+                        responseType: 'blob'
+                    },
+                    success: function (response) {
+                        // Create a hidden link to download the file
+                        var link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(new Blob([response]));
+                        link.download = 'Pressure Transmitter Historical.xlsx';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle the error
+                        console.log(xhr.responseText);
+                    }
+                });
+            }
+
+            function reloadTable() {
+                oTable.ajax.reload(null, false);
+            }
         </script>
+        
     }
 </head>
 <!-- Begin Page Content -->
@@ -63,7 +100,7 @@
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Historical List</h1>
-        <a value="reload" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
+        <a value="reload" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm" onclick="reloadTable()">
             <i class="fas fa-redo-alt"></i>
         </a>
     </div>
@@ -76,15 +113,29 @@
             <!-- Filter -->
             <form>
                 <div class="form-row">
-                    <div class="form-group col-md-2">
-                        <label for="dataInterval">Data Interval</label>
-                        <select id="dataInterval" class="form-control custom-select custom-select-sm"></select>
+                    <div class="form-group col-md-3">
+                        <input class="form-control" id="dateFrom" placeholder="Date From" onchange="reloadTable();" type="text" value="@DateTime.Now.ToString("dd MMMM yyyy 00:00:00")">
                     </div>
+                    <div class="form-group col-md-3">
+                        <input class="form-control" id="dateUntil" placeholder="Date Until" onchange="reloadTable();" type="text" value="@DateTime.Now.ToString("dd MMMM yyyy HH:mm:ss")">
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Spacer -->
+                    </div>
+                    <div class="col-md-3 text-right">
+                        <button type="button" class="btn btn-success" id="btnExportToExcel">
+                            Export Excel
+                        </button>
+                        <button type="button" class="btn btn-info" id="btnResetFilter">
+                            Reset Filter
+                        </button>
+                    </div>
+                    
                 </div>
             </form>
 
             <!-- Divider -->
-            <hr class="sidebar-divider mt-0">
+            <hr class="sidebar-divider mt-1">
 
             <!-- Tank Table -->
             @await Html.PartialAsync("_ViewAll", Model)
