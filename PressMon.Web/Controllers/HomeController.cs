@@ -64,7 +64,8 @@ namespace PressMon.Web.Controllers
             int skip = start != null ? Convert.ToInt32(start) : 0;
             int recordsTotal = 0;
 
-            string timeInterval = Request.Form["columns[0][search][value]"].FirstOrDefault();
+            string timeInterval = Request.Form["timeInterval"].FirstOrDefault();
+            var currentTime = DateTime.UtcNow;
 
             var liveDatas = (from p in _context.Historicals select p).OrderBy(x => x).Reverse();
             var Datas = from p in liveDatas
@@ -76,21 +77,31 @@ namespace PressMon.Web.Controllers
                             TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
                         };
 
+            //var Datas = from p in liveDatas
+            //            let timestamp = UnixTimeStampToDateTime(p.TimeStamp)
+            //            where timestamp >= currentTime.AddMinutes(-1)
+            //            select new
+            //            {
+            //                p.HistoricalID,
+            //                p.LocationName,
+            //                p.Pressure,
+            //                TimeStamp = timestamp
+            //            };
 
-            if (timeInterval == "Minutes")
-            {
-                // Group data by time interval
-                var groupedData = Datas.GroupBy(model => new { model.TimeStamp.Year, model.TimeStamp.Month, model.TimeStamp.Day, model.TimeStamp.Hour, model.TimeStamp.Minute })
-                    .Select(group => new
-                    {
-                        Minute = new DateTime(group.Key.Year, group.Key.Month, group.Key.Day, group.Key.Hour, group.Key.Minute, 0),
-                        Models = group.ToList()
-                    })
-                    .ToList();
+            //if (timeInterval == "Minutes")
+            //{
+            //    // Group data by time interval
+            //    var groupedData = Datas.GroupBy(model => new { model.TimeStamp.Year, model.TimeStamp.Month, model.TimeStamp.Day, model.TimeStamp.Hour, model.TimeStamp.Minute })
+            //        .Select(group => new
+            //        {
+            //            Minute = new DateTime(group.Key.Year, group.Key.Month, group.Key.Day, group.Key.Hour, group.Key.Minute, 0),
+            //            Models = group.ToList()
+            //        })
+            //        .ToList();
 
-                // Flatten the grouped data and convert to IQueryable
-                Datas = groupedData.SelectMany(group => group.Models).AsQueryable();
-            }
+            //    // Flatten the grouped data and convert to IQueryable
+            //    Datas = groupedData.SelectMany(group => group.Models).AsQueryable();
+            //}
 
 
             //total number of rows counts

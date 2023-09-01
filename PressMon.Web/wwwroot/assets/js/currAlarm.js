@@ -5,6 +5,12 @@ $(document).ready(function () {
     var sound = document.getElementById("sound");
     var visibleDuration = sound.duration * 1000; // Duration in milliseconds for the visible state
     var hiddenDuration = visibleDuration / 2; // Duration in milliseconds for the hidden state
+
+    var blinkingTextM02 = document.getElementById("blinkingTextM02");
+    var pressM02 = document.getElementById("press-value-M02");
+    var soundM02 = document.getElementById("soundM02");
+    var visibleDurationM02 = soundM02.duration * 1000; // Duration in milliseconds for the visible state
+    var hiddenDurationM02 = visibleDurationM02 / 2; // Duration in milliseconds for the hidden state
     var blinkInterval; // Variable to store the interval ID
     
 
@@ -23,11 +29,35 @@ $(document).ready(function () {
             }, visibleDuration);
         }
     }
+
+    function blinkTextM02() {
+        if (blinkingTextM02.style.visibility === "" || blinkingTextM02.style.visibility === "visible") {
+            blinkingTextM02.style.visibility = "hidden";
+            setTimeout(function () {
+                blinkingTextM02.style.visibility = "visible";
+                sound.play();
+            }, hiddenDurationM02);
+        } else {
+            blinkingTextM02.style.visibility = "visible";
+            setTimeout(function () {
+                blinkingTextM02.style.visibility = "hidden";
+                sound.pause();
+            }, visibleDurationM02);
+        }
+    }
+
     function Disabled() {
         blinkingText.style.visibility = "hidden";
         sound.pause();
         sound.currentTime = 0;
     }
+
+    function DisabledM02() {
+        blinkingTextM02.style.visibility = "hidden";
+        soundM02.pause();
+        soundM02.currentTime = 0;
+    }
+    
     function SettingAlarm() {
         $.ajax({
             url: baseUrl + "GetAlarm",
@@ -73,20 +103,20 @@ $(document).ready(function () {
 
                 if (valM02 >= valH) {
                     if (valM02 >= valHH) {
-                        press.textContent = "PT-02 HH : " + valM02.toString() + " Bar";
+                        pressM02.textContent = "PT-02 HH : " + valM02.toString() + " Bar";
                     } else {
-                        press.textContent = "PT-02 H : " + valM02.toString() + " Bar";
+                        pressM02.textContent = "PT-02 H : " + valM02.toString() + " Bar";
                     }
-                    blinkText();
+                    blinkTextM02();
                 } else if (valM02 <= valL) {
                     if (valM02 <= valLL) {
-                        press.textContent = "PT-02 LL : " + valM02.toString() + " Bar";
+                        pressM02.textContent = "PT-02 LL : " + valM02.toString() + " Bar";
                     } else {
-                        press.textContent = "PT-02 L : " + valM02.toString() + " Bar";
+                        pressM02.textContent = "PT-02 L : " + valM02.toString() + " Bar";
                     }
-                    blinkText();
+                    blinkTextM02();
                 } else {
-                    Disabled();
+                    DisabledM02();
                 }
 
             },

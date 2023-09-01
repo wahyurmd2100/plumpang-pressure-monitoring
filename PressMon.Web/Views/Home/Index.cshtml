@@ -14,41 +14,41 @@
             $(document).ready(function () {
                 ////////////////////////////////////// end datatable //////////////////////////////////////
                 var oTable = $('#tb-record').DataTable({
-                        "searching": false,
-                        "lengthChange": false,  // Disable the "Show entries" dropdown
-                        "pageLength": 5,      // Set the default number of entries displayed to 10
-                        "serverSide": true, // for process server side
-                        "scrollY": true,
-                        "scrollX": true,
-                        "autoWidth": false,
-                        "scrollCollapse": true,
-                        "paging": true,
-                        "fixedColumns": true,
-                        "processing": false,
-                        "info": false,
-                        "ajax": {
-                            "url": "@Url.Action("GetDataRecord","Home")",
-                            "type": "POST",
-                            "datatype": "json",
-                            "data" : function (d){
-                                d.columns[0].search.value = $('#input-time-interval').val();
-                            },
-                            //"success" : function (a){
-                            //    console.log(a);
-                            //}
+                    "searching": false,
+                    "lengthChange": false,  // Disable the "Show entries" dropdown
+                    "pageLength": 5,      // Set the default number of entries displayed to 10
+                    "serverSide": true, // for process server side
+                    "scrollY": true,
+                    "scrollX": true,
+                    "autoWidth": false,
+                    "scrollCollapse": true,
+                    "paging": true,
+                    "fixedColumns": true,
+                    "processing": false,
+                    "info": false,
+                    "ajax": {
+                        "url": "@Url.Action("GetDataRecord","Home")",
+                        "type": "POST",
+                        "datatype": "json",
+                        "data": function (d) {
+                            // d.timeInterval = document.getElementById("filterTimeInterval").value;
                         },
-                        "columnDefs": [{
-                            "targets": 0,
-                            "visible": false,
-                            "searchable": false
-                        }],
-                        "columns": [
-                            { "data": "historicalID", "name": "HistoricalID", "autoWidth": true },
-                            { "data": "locationName", "name": "LocationName", "autoWidth": true },
-                            { "data": "pressure", "name": "Pressure", "autoWidth": true },
-                            { "data": "timeStamp", "name": "TimeStamp", "autoWidth": true },
-                        ]
-                    }
+                        //"success" : function (a){
+                        //    console.log(a);
+                        //}
+                    },
+                    "columnDefs": [{
+                        "targets": 0,
+                        "visible": false,
+                        "searchable": false
+                    }],
+                    "columns": [
+                        { "data": "historicalID", "name": "HistoricalID", "autoWidth": true },
+                        { "data": "locationName", "name": "LocationName", "autoWidth": true },
+                        { "data": "pressure", "name": "Pressure", "autoWidth": true },
+                        { "data": "timeStamp", "name": "TimeStamp", "autoWidth": true },
+                    ]
+                }
                 );
 
                 ////////////////////////////////////// end datatable //////////////////////////////////////
@@ -66,7 +66,7 @@
                 var pressCtxPT02 = pressCanvasPT02.getContext('2d');
                 var gaugeViewCtxPT01 = document.getElementById('gaugeViewPT01').getContext('2d');
                 var gaugeViewCtxPT02 = document.getElementById('gaugeViewPT02').getContext('2d');
-                
+
 
                 var pressOptions = {
                     responsive: true,
@@ -317,7 +317,7 @@
 
     <!-- Dashboard -->
 
-    
+
     <div class="row g-2">
         <!-------------------------------- Start PT-01 -------------------------------->
         <div class="col-3">
@@ -333,7 +333,6 @@
             </div>
         </div>
         <!-------------------------------- End PT-01 -------------------------------->
-
         <!-------------------------------- Start PT-02 -------------------------------->
         <div class="col-3">
             <div class="card h-100 d-flex flex-column shadow-lg rounded">
@@ -348,7 +347,6 @@
             </div>
         </div>
         <!-------------------------------- End PT-02 -------------------------------->
-
         <!-------------------------------- Start Table -------------------------------->
         <div class="col-6">
             <div class="card shadow-lg rounded h-100">
@@ -363,16 +361,16 @@
                                     </a>
                                 </h5>
                             </div>
-                            <div class="col-4">
-                                <select class="form-control" id="input-time-interval">
-                                    <option value="">---</option>
+                            @* <div class="col-4">
+                                <select class="form-control" id="filterTimeInterval">
+                                    <option value="Seconds">---</option>
                                     <option value="Minutes">Minutes</option>
                                     <option value="Hours">Hours</option>
                                 </select>
-                            </div>
+                            </div> *@
                         </div>
                     </form>
-                    
+
                     <!-- Tank Table -->
                     @await Html.PartialAsync("_ViewAll", Model)
                     <!-- End Tank table -->
@@ -381,7 +379,7 @@
         </div>
         <!-------------------------------- End Table -------------------------------->
     </div>
-    
+
     <!-------------------------------- Start LineChart -------------------------------->
     <div class="row my-4">
         <div class="col-12">

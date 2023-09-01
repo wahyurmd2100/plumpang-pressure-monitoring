@@ -308,6 +308,22 @@ namespace TMS.Web.Migrations
                     b.ToTable("LiveDatas");
                 });
 
+            modelBuilder.Entity("TMS.Web.Models.WaAlarmMessageStatus", b =>
+                {
+                    b.Property<int>("AlarmId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ApiResponse")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("status")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("AlarmId");
+
+                    b.ToTable("WaAlarmMessageStatuses");
+                });
+
             modelBuilder.Entity("PressMon.Web.Areas.Identity.Data.AppRole", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityRole");
@@ -375,6 +391,22 @@ namespace TMS.Web.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("TMS.Web.Models.WaAlarmMessageStatus", b =>
+                {
+                    b.HasOne("TMS.Web.Models.Alarm", "Alarm")
+                        .WithOne("WaAlarmMessageStatus")
+                        .HasForeignKey("TMS.Web.Models.WaAlarmMessageStatus", "AlarmId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Alarm");
+                });
+
+            modelBuilder.Entity("TMS.Web.Models.Alarm", b =>
+                {
+                    b.Navigation("WaAlarmMessageStatus");
                 });
 #pragma warning restore 612, 618
         }

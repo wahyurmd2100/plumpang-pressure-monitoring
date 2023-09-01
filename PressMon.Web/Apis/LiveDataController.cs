@@ -20,13 +20,13 @@ namespace TMS.Web.Apis
         private readonly IHubContext<HomeHub> _hubContext;
         private readonly DataContext _context;
         //
-        private enum Alarm_val : int
-        {
-            LL = 10,
-            L = 20,
-            H = 30,
-            HH = 40
-        }
+        //private enum Alarm_val : int
+        //{
+        //    LL = 10,
+        //    L = 20,
+        //    H = 30,
+        //    HH = 40
+        //}
         public LiveDataController(IHubContext<HomeHub> hubContext, DataContext context)
         {
             _hubContext = hubContext;
@@ -61,35 +61,95 @@ namespace TMS.Web.Apis
             }
             return Ok(new { Success = false, Message = "Update Failed" });
         }
+        public async Task<IActionResult> getAlarmSettings()
+        {
+            var data = (from p in _context.AlarmSettings
+                        select new
+                        {
+                            p.AlarmSettingID,
+                            p.Value,
+                            p.Info
+                        }).ToList();
+
+            if (data != null)
+            {
+                return Ok(new { Success = true, data = data });
+            }
+            return Ok(new { Success = false, Message = "Get AlarmSettings Failed" });
+        }
         /// <summary>
         /// Set Alarm
         /// </summary>
         /// <param name="liveData"></param>
         private void SetAlarm(LiveData liveData)
         {
-            Alarm alarm = null;
-            //
-            if(liveData.Pressure <= (double)Alarm_val.LL)
+            double LLpoint = 0;
+            double Lpoint = 0;
+            double Hpoint = 0;
+            double HHpoint = 0;
+
+            var alarmPoint = (from p in _context.AlarmSettings
+                              select new
+                              {
+                                  p.AlarmSettingID,
+                                  p.Value
+                              });
+
+            foreach (var alarmPoints in alarmPoint)
             {
-                alarm = new Alarm { AlarmStatus = "LL", LocationName = liveData.LocationName, Pressure = liveData.Pressure, TimeStamp = liveData.TimeStamp };
+                if (alarmPoints.AlarmSettingID == 1)
+                {
+                    LLpoint = alarmPoints.Value;
+                }else if (alarmPoints.AlarmSettingID == 2)
+                {
+                    Lpoint = alarmPoints.Value;
+                }
+                else if (alarmPoints.AlarmSettingID == 3)
+                {
+                    Hpoint = alarmPoints.Value;
+                }
+                else if (alarmPoints.AlarmSettingID == 4)
+                {
+                    HHpoint = alarmPoints.Value;
+                }
             }
-            else if (liveData.Pressure > (double)Alarm_val.LL && liveData.Pressure <=(double)Alarm_val.L)
+
+            Alarm alarm = null;
+            //WaAlarmMessageStatus WAstatus = null;
+            //
+            if (liveData.Pressure <= Lpoint && liveData.Pressure > LLpoint)
             {
                 alarm = new Alarm { AlarmStatus = "L", LocationName = liveData.LocationName, Pressure = liveData.Pressure, TimeStamp = liveData.TimeStamp };
+                //WAstatus = new WaAlarmMessageStatus { status = 1 };
             }
-            else if (liveData.Pressure > (double)Alarm_val.H && liveData.Pressure <= (double)Alarm_val.HH)
+            else if (liveData.Pressure >= Hpoint && liveData.Pressure < HHpoint)
             {
                 alarm = new Alarm { AlarmStatus = "H", LocationName = liveData.LocationName, Pressure = liveData.Pressure, TimeStamp = liveData.TimeStamp };
             }
-            else if (liveData.Pressure > (double)Alarm_val.HH)
+            else if (liveData.Pressure <= LLpoint)
+            {
+                alarm = new Alarm { AlarmStatus = "LL", LocationName = liveData.LocationName, Pressure = liveData.Pressure, TimeStamp = liveData.TimeStamp };
+            }
+            else if (liveData.Pressure >= HHpoint)
             {
                 alarm = new Alarm { AlarmStatus = "HH", LocationName = liveData.LocationName, Pressure = liveData.Pressure, TimeStamp = liveData.TimeStamp };
             }
+
             if(alarm != null)
             {
                 _context.Add(alarm);
             }
+
+            //if (alarm != null && WAstatus != null)
+            //{
+            //    _context.Add(WAstatus);
+            //}
         }
+
+        //private void WApostStatus()
+        //{
+        //    WaAlarmMessageStatus waMessageStatus = new WaAlarmMessageStatus();
+        //}
     }
     //
    
