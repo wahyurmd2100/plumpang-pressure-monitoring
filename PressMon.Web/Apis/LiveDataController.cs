@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
 using PressMon.Web.Data;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using TMS.Web.Hubs;
 using TMS.Web.Models;
@@ -115,12 +116,9 @@ namespace TMS.Web.Apis
             }
 
             Alarm alarm = null;
-            //WaAlarmMessageStatus WAstatus = null;
-            //
             if (liveData.Pressure <= Lpoint && liveData.Pressure > LLpoint)
             {
                 alarm = new Alarm { AlarmStatus = "L", LocationName = liveData.LocationName, Pressure = liveData.Pressure, TimeStamp = liveData.TimeStamp };
-                //WAstatus = new WaAlarmMessageStatus { status = 1 };
             }
             else if (liveData.Pressure >= Hpoint && liveData.Pressure < HHpoint)
             {
@@ -137,19 +135,18 @@ namespace TMS.Web.Apis
 
             if(alarm != null)
             {
+                //WApostStatus(alarm);
                 _context.Add(alarm);
             }
-
-            //if (alarm != null && WAstatus != null)
-            //{
-            //    _context.Add(WAstatus);
-            //}
         }
 
-        //private void WApostStatus()
-        //{
-        //    WaAlarmMessageStatus waMessageStatus = new WaAlarmMessageStatus();
-        //}
+        private void WApostStatus(Alarm alarm)
+        {
+            WaAlarmMessageStatus WAstatus = null;
+            WAstatus = new WaAlarmMessageStatus { status = 0, Alarm = alarm };
+            WAstatus.Alarm = alarm;
+            _context.Add(WAstatus);
+        }
     }
     //
    

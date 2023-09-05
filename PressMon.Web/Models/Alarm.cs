@@ -7,6 +7,6 @@
         public string LocationName { get; set; }
         public double Pressure { get; set; }
         public int TimeStamp { get; set; }
-        //public virtual WaAlarmMessageStatus WaAlarmMessageStatus { get; set; }
+        public virtual WaAlarmMessageStatus WaAlarmMessageStatus { get; set; }
     }
 }

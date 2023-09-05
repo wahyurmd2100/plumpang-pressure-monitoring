@@ -26,6 +26,6 @@ namespace PressMon.Web.Data
         public DbSet<Alarm> Alarms { get; set; }
         public DbSet<Historical> Historicals { get; set; }
         public DbSet<AlarmSettings> AlarmSettings { get; set; }
-        //public DbSet<WaAlarmMessageStatus> WaAlarmMessageStatuses { get; set; }
+        public DbSet<WaAlarmMessageStatus> WaAlarmMessageStatuses { get; set; }
     }
 }
