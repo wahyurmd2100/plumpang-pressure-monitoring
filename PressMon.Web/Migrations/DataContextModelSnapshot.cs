@@ -324,6 +324,23 @@ namespace TMS.Web.Migrations
                     b.ToTable("WaAlarmMessageStatuses");
                 });
 
+            modelBuilder.Entity("TMS.Web.Models.WaContactList", b =>
+                {
+                    b.Property<int>("ContactID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ContactName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ContactNumber")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ContactID");
+
+                    b.ToTable("WaContactLists");
+                });
+
             modelBuilder.Entity("PressMon.Web.Areas.Identity.Data.AppRole", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityRole");

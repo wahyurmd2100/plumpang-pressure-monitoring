@@ -1,0 +1,200 @@
+﻿@model TMS.Web.Models.WaContactList
+@{
+    ViewData["Title"] = "WA Contact List";
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+<head>
+    @section Scripts{
+        <script type="text/javascript" asp-append-version="true">
+            var oTable;
+            $(document).ready(function () {
+                // Initialize DataTable
+                oTable = $('#tb-contact-list').DataTable({
+                    "serverSide": true, // for process server side
+                    "scrollY": true,
+                    "scrollX": true,
+                    "autoWidth": false,
+                    "scrollCollapse": true,
+                    "paging": true,
+                    "fixedColumns": true,
+                    "processing": true,
+                    "ajax": {
+                        "url": "@Url.Action("LoadData")",
+                        "type": "POST",
+                        "datatype": "json",
+                        // "dataSrc" : function (data){
+                        //     console.log(data);
+                        //     return data;
+                        // }
+                    },
+                    "columnDefs": [{
+                        "targets": 0,
+                        "visible": false,
+                        "searchable": false
+                    }],
+                    "columns": [
+                        { "data": "contactID", "name": "ContactID", "autoWidth": true },
+                        {
+                            data: null,
+                            render: function (data, type, full, meta) {
+                                return "<button type='button' class='btn btn-warning'onclick=UpdateData('" + full.contactID + "');><i class='fas fa-edit fa-lg'></i> Edit</button> <button type='button' class='btn btn-danger' onclick=DeleteData('" + full.contactID + "');><i class='fas fa-trash-alt'></i>Delete</button>";
+                            }
+                        },
+                        { "data": "contactName", "name": "ContactName", "autoWidth": true },
+                        { "data": "contactNumber", "name": "contactNumber", "autoWidth": true },
+                    ]
+                });
+            });
+
+            function UpdateData(contactID) {
+                var toSend =
+                {
+                    id: contactID
+                };
+                $.ajax({
+                    type: "GET",
+                    contentType: "application/json; charset=utf-8",
+                    url: "@Url.Action("AddOrEdit")",
+                    data: toSend,
+                    success: function (res) {
+                        jQuery.noConflict();
+                        $("#form-modal").modal();
+                        $("#form-modal .modal-body").html(res);
+                        $("#form-modal .modal-title").html('WhatsApp Contact');
+                        $("#form-modal").modal('show');
+                    },
+                    error: function (res) {
+                        console.log(res);
+                    }
+                })
+            }
+            //start delete data
+            function DeleteData(id) {
+                if (confirm('Are you sure want to delete this data ?')) {
+                    var toSend =
+                    {
+                        id: id
+                    };
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("Delete")",
+                        data: toSend,
+                        success: function (res) {
+                            oTable.ajax.reload(null, false);
+                        },
+                        error: function (err) {
+                            console.log(err);
+                        }
+                    })
+                }
+            }
+            // document.getElementById('btnSendManual').addEventListener('click', sendWA);
+            // function sendWA() {
+            //     const numWA = document.getElementById('numWA').value;
+                
+            //     $.ajax({
+            //         type: "POST",
+            //         url : "@Url.Action("sendWA")",
+            //         data: JSON.stringify({ numWA: numWA }),
+            //         success : function (res){
+            //             console.log(res);
+            //         },
+            //         error: function (err) {
+            //             console.log(err);
+            //         }
+            //     })
+            // }
+
+            // document.getElementById("btnResetFilter").addEventListener("click", reset);
+            // function reset() {
+            //     document.getElementById("dateFrom").value = "";
+            //     document.getElementById("dateUntil").value = "";
+            //     reloadTable();
+            // }
+
+            // document.getElementById("btnExportToExcel").addEventListener("click", exportToExcel);
+            // function exportToExcel() {
+            //     var dateFrom = document.getElementById("dateFrom").value;
+            //     var dateUntil = document.getElementById("dateUntil").value;
+
+            //     $.ajax({
+            //         url: 'Url.Action("ExportToExcel")',
+            //         method: 'POST',
+            //         data: { DateFrom: dateFrom, DateUntil: dateUntil },
+            //         xhrFields: {
+            //             responseType: 'blob'
+            //         },
+            //         success: function (response) {
+            //             // Create a hidden link to download the file
+            //             var link = document.createElement('a');
+            //             link.href = window.URL.createObjectURL(new Blob([response]));
+            //             link.download = 'Pressure Transmitter Historical.xlsx';
+            //             document.body.appendChild(link);
+            //             link.click();
+            //             document.body.removeChild(link);
+            //         },
+            //         error: function (xhr, status, error) {
+            //             // Handle the error
+            //             console.log(xhr.responseText);
+            //         }
+            //     });
+            // }
+
+            function reloadTable() {
+                oTable.ajax.reload(null, false);
+            }
+        </script>
+
+    }
+</head>
+
+
+<div class="container-fluid" style="width: 100%;">
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">WhatsApp Config</h1>
+        <a value="reload" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm" onclick="reloadTable()">
+            <i class="fas fa-redo-alt"></i>
+        </a>
+    </div>
+
+    <!-- Submain Content -->
+    <div class="card shadow-lg rounded" style="font-size:12px;">
+        <div class="card-header bg-gradient-info p-1"></div>
+        <div class="card-body">
+            <!-- Filter -->
+            <form>
+                <div>
+                    @* <div class="form-group col-md-3">
+                        <input class="form-control" id="numWA" placeholder="62123456789" type="text">
+                    </div> *@
+                    <div class="col-md-3">
+                        <!--<button type="button" class="btn btn-success" id="btnExportToExcel">
+                            Export Excel
+                        </button>-->
+
+                        <button type="button" class="btn btn-primary" onclick="showInPopup('@Url.Action("AddOrEdit","WaContactList",null,Context.Request.Scheme)','Add New Contact')">
+                            <i class="fas fa-plus"></i> New
+                        </button>
+                        <button type="button" class="btn btn-success" id="btnSendManual">
+                            <i class="fab fa-whatsapp"></i> Manual Post
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider mt-1">
+
+            <!-- Table -->
+            @await Html.PartialAsync("_ViewAll", Model)
+            <!-- End table -->
+
+        </div>
+    </div>
+    <!-- End Submain Content -->
+
+</div>
+<!-- End Page Content -->

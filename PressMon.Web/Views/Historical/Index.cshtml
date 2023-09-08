@@ -6,12 +6,12 @@
 <!-- Begin Page Content -->
 <head>
     @section Scripts{
-        <script src="https://cdn.jsdelivr.net/npm/tableexport@5.2.0/dist/js/tableexport.min.js"></script>
+        @* <script src="https://cdn.jsdelivr.net/npm/tableexport@5.2.0/dist/js/tableexport.min.js"></script> *@
         <script type="text/javascript" asp-append-version="true">
             var oTable;
             $(document).ready(function () {
                 // Initialize DataTable
-                oTable = $('#tb-historical').DataTable({
+                oTable = $('#tb-contact-list').DataTable({
                     "serverSide": true, // for process server side
                     "scrollY": true,
                     "scrollX": true,
@@ -24,9 +24,12 @@
                         "url": "@Url.Action("LoadData")",
                         "type": "POST",
                         "datatype": "json",
+                        // "success" : function (data){
+                        //     console.log(data);
+                        // }
                         "data": function (d) {
-                            d.DateFrom = document.getElementById("dateFrom").value;
-                            d.DateUntil = document.getElementById("dateUntil").value;
+                            d.datefrom = document.getelementbyid("datefrom").value;
+                            d.dateuntil = document.getelementbyid("dateuntil").value;
                         }
                     },
                     "columnDefs": [{
