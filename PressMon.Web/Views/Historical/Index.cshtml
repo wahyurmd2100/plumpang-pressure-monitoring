@@ -11,7 +11,7 @@
             var oTable;
             $(document).ready(function () {
                 // Initialize DataTable
-                oTable = $('#tb-contact-list').DataTable({
+                oTable = $('#tb-historical').DataTable({
                     "serverSide": true, // for process server side
                     "scrollY": true,
                     "scrollX": true,
@@ -21,15 +21,12 @@
                     "fixedColumns": true,
                     "processing": true,
                     "ajax": {
-                        "url": "@Url.Action("LoadData")",
+                        "url": "@Url.Action("LoadData","Historical")",
                         "type": "POST",
                         "datatype": "json",
-                        // "success" : function (data){
-                        //     console.log(data);
-                        // }
                         "data": function (d) {
-                            d.datefrom = document.getelementbyid("datefrom").value;
-                            d.dateuntil = document.getelementbyid("dateuntil").value;
+                            d.datefrom = document.getElementById("date-From").value;
+                            d.dateuntil = document.getElementById("date-Until").value;
                         }
                     },
                     "columnDefs": [{
@@ -46,10 +43,10 @@
                 });
 
                 // Create date inputs
-                minDate = new DateTime($('#dateFrom'), {
+                minDate = new DateTime($('#date-From'), {
                     format: 'D MMMM yyyy HH:mm:ss'
                 });
-                maxDate = new DateTime($('#dateUntil'), {
+                maxDate = new DateTime($('#date-Until'), {
                     format: 'D MMMM yyyy HH:mm:ss'
                 });
 
@@ -57,15 +54,15 @@
 
             document.getElementById("btnResetFilter").addEventListener("click", reset);
             function reset() {
-                document.getElementById("dateFrom").value = "";
-                document.getElementById("dateUntil").value = "";
+                document.getElementById("date-From").value = "";
+                document.getElementById("date-Until").value = "";
                 reloadTable();
             }
 
             document.getElementById("btnExportToExcel").addEventListener("click", exportToExcel);
             function exportToExcel() {
-                var dateFrom = document.getElementById("dateFrom").value;
-                var dateUntil = document.getElementById("dateUntil").value;
+                var dateFrom = document.getElementById("date-From").value;
+                var dateUntil = document.getElementById("date-Until").value;
 
                 $.ajax({
                     url: '@Url.Action("ExportToExcel")',
@@ -117,10 +114,10 @@
             <form>
                 <div class="form-row">
                     <div class="form-group col-md-3">
-                        <input class="form-control" id="dateFrom" placeholder="Date From" onchange="reloadTable();" type="text" value="@DateTime.Now.ToString("dd MMMM yyyy 00:00:00")">
+                        <input class="form-control" id="date-From" placeholder="Date From" onchange="reloadTable();" type="text" value="@DateTime.Now.ToString("dd MMMM yyyy 00:00:00")">
                     </div>
                     <div class="form-group col-md-3">
-                        <input class="form-control" id="dateUntil" placeholder="Date Until" onchange="reloadTable();" type="text" value="@DateTime.Now.ToString("dd MMMM yyyy HH:mm:ss")">
+                        <input class="form-control" id="date-Until" placeholder="Date Until" onchange="reloadTable();" type="text" value="@DateTime.Now.ToString("dd MMMM yyyy HH:mm:ss")">
                     </div>
                     <div class="col-md-3">
                         <!-- Spacer -->
