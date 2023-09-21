@@ -67,7 +67,7 @@ namespace PressMon.Web.Controllers
             string timeInterval = Request.Form["timeInterval"].FirstOrDefault();
             var currentTime = DateTime.UtcNow;
 
-            var liveDatas = (from p in _context.Historicals select p).OrderBy(x =>x.HistoricalID).Reverse();
+            var liveDatas = (from p in _context.Historicals select p).OrderBy(x => x).Reverse();
             var Datas = from p in liveDatas
                         select new
                         {

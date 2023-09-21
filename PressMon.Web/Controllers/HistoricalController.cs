@@ -8,16 +8,13 @@ using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel; // Import the XSSF namespace
 using NPOI.HSSF.Record.Chart;
-using Microsoft.Extensions.Logging;
-using PressMon.Web.Controllers;
 
 namespace TMS.Web.Controllers
 {
     public class HistoricalController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly DataContext _context;
-        public HistoricalController(ILogger<HistoricalController> logger,DataContext context)
+        public HistoricalController(DataContext context)
         {
             _context = context;
         }
@@ -38,34 +35,36 @@ namespace TMS.Web.Controllers
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int recordsTotal = 0;
 
+                
+                DateTime? DateFrom = string.IsNullOrEmpty(Request.Form["DateFrom"]) ? (DateTime?)null : DateTime.Parse(Request.Form["DateFrom"]);
+                DateTime? DateUntil = string.IsNullOrEmpty(Request.Form["DateUntil"]) ? (DateTime?)null : DateTime.Parse(Request.Form["DateUntil"]);
+                
 
-                DateTimeOffset DateFrom = DateTimeOffset.Parse(Request.Form["DateFrom"]);
-                DateTimeOffset DateUntil = DateTimeOffset.Parse(Request.Form["DateUntil"]);
-
-                int unixDateFrom =(int) DateFrom.ToUnixTimeSeconds();
-                int unixDateTo = (int)DateUntil.ToUnixTimeSeconds();
                 // Get all data from the database
-                //var historicals = _context.Historicals.ToList().Select(p => new
-                //{
-                //    p.HistoricalID,
-                //    p.LocationName,
-                //    p.Pressure,
-                //    TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
-                //}).OrderBy(t => t.HistoricalID).Reverse();
-                var result= (from p in _context.Historicals
-                                   select p).OrderBy(t => t.HistoricalID).Reverse().Where(t=>t.TimeStamp>=unixDateFrom && t.TimeStamp<=unixDateTo).ToList();
-               
-
-                var historicals = from p in result select new
+                var historicals = _context.Historicals.ToList().Select(p => new
                 {
                     p.HistoricalID,
                     p.LocationName,
                     p.Pressure,
                     TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
-                };
+                }).OrderBy(t => t.HistoricalID).Reverse();
+
+                if (DateFrom != null && DateUntil != null)
+                {
+                    historicals = historicals.Where(t => t.TimeStamp >= DateFrom && t.TimeStamp <= DateUntil);
+                }
+                else if (DateFrom == null && DateUntil != null)
+                {
+                    historicals = historicals.Where(t => t.TimeStamp <= DateUntil);
+                }
+                else if (DateFrom != null && DateUntil == null)
+                {
+                    historicals = historicals.Where(t => t.TimeStamp >= DateFrom);
+                }
+
 
                 // Total number of rows counts   
-                recordsTotal = historicals == null? 0:result.Count();
+                recordsTotal = historicals.Count();
                 //Paging   
                 var data = historicals.Skip(skip).Take(pageSize).ToList();
                 //Returning Json Data  
