@@ -52,14 +52,14 @@
 
             });
 
-            document.getElementById("btnResetFilter").addEventListener("click", reset);
+            // document.getElementById("btnResetFilter").addEventListener("click", reset);
             function reset() {
-                document.getElementById("date-From").value = "";
-                document.getElementById("date-Until").value = "";
+                document.getElementById("date-From").value = "@DateTime.Now";
+                document.getElementById("date-Until").value = "@DateTime.Now";
                 reloadTable();
             }
 
-            document.getElementById("btnExportToExcel").addEventListener("click", exportToExcel);
+            // document.getElementById("btnExportToExcel").addEventListener("click", exportToExcel);
             function exportToExcel() {
                 var dateFrom = document.getElementById("date-From").value;
                 var dateUntil = document.getElementById("date-Until").value;
@@ -123,10 +123,10 @@
                         <!-- Spacer -->
                     </div>
                     <div class="col-md-3 text-right">
-                        <button type="button" class="btn btn-success" id="btnExportToExcel">
+                        <button type="button" class="btn btn-success" id="btnExportToExcel" onclick="exportToExcel()">
                             Export Excel
                         </button>
-                        <button type="button" class="btn btn-info" id="btnResetFilter">
+                        <button type="button" class="btn btn-info" id="btnResetFilter" onclick="reset()">
                             Reset Filter
                         </button>
                     </div>

@@ -34,31 +34,34 @@ namespace TMS.Web.Controllers
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int recordsTotal = 0;
 
-                DateTime? DateFrom = string.IsNullOrEmpty(Request.Form["DateFrom"]) ? (DateTime?)null : DateTime.Parse(Request.Form["DateFrom"]);
-                DateTime? DateUntil = string.IsNullOrEmpty(Request.Form["DateUntil"]) ? (DateTime?)null : DateTime.Parse(Request.Form["DateUntil"]);
+                DateTimeOffset DateFrom = DateTimeOffset.Parse(Request.Form["DateFrom"]);
+                DateTimeOffset DateUntil = DateTimeOffset.Parse(Request.Form["DateUntil"]);
+
+                int unixDateFrom = (int)DateFrom.ToUnixTimeSeconds();
+                int unixDateUntil = (int)DateUntil.ToUnixTimeSeconds();
+
+                var result = (from p in _context.Alarms
+                              select p).OrderBy(t => t.AlarmID).Reverse().Where(t => t.TimeStamp >= unixDateFrom && t.TimeStamp <= unixDateUntil).ToList();
 
                 //get all data
-                var alarms = _context.Alarms.ToList().Select(p => new
-                {
-                    p.AlarmID,
-                    p.AlarmStatus,
-                    p.LocationName,
-                    p.Pressure,
-                    TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
-                }).OrderBy(t => t.AlarmID).Reverse();
+                var alarms = from p in result
+                             select new
+                             {
+                                 p.AlarmID,
+                                 p.AlarmStatus,
+                                 p.LocationName,
+                                 p.Pressure,
+                                 TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
+                             };
 
-                if (DateFrom != null && DateUntil != null)
-                {
-                    alarms = alarms.Where(t => t.TimeStamp >= DateFrom && t.TimeStamp <= DateUntil);
-                }
-                else if (DateFrom == null && DateUntil != null)
-                {
-                    alarms = alarms.Where(t => t.TimeStamp <= DateUntil);
-                }
-                else if (DateFrom != null && DateUntil == null)
-                {
-                    alarms = alarms.Where(t => t.TimeStamp >= DateFrom);
-                }
+                //    _context.Alarms.ToList().Select(p => new
+                //{
+                //    p.AlarmID,
+                //    p.AlarmStatus,
+                //    p.LocationName,
+                //    p.Pressure,
+                //    TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
+                //}).OrderBy(t => t.AlarmID).Reverse();
 
                 //total number of rows counts   
                 recordsTotal = alarms.Count();
@@ -93,29 +96,26 @@ namespace TMS.Web.Controllers
                 rowDate.CreateCell(0).SetCellValue("Date Export : ");
                 rowDate.CreateCell(1).SetCellValue(DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"));
 
-                // Get the data model from your database or other source
-                var alarms = _context.Alarms.ToList().Select(p => new
-                {
-                    p.AlarmID,
-                    p.AlarmStatus,
-                    p.LocationName,
-                    p.Pressure,
-                    TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
-                });
+                // Convert DateTime? to DateTimeOffset?
+                DateTimeOffset? dateFromOffset = DateFrom.HasValue ? new DateTimeOffset(DateFrom.Value) : null;
+                DateTimeOffset? dateUntilOffset = DateUntil.HasValue ? new DateTimeOffset(DateUntil.Value) : null;
 
-                // Filter data based on the selected date range
-                if (DateFrom != null && DateUntil != null)
-                {
-                    alarms = alarms.Where(t => t.TimeStamp >= DateFrom && t.TimeStamp <= DateUntil);
-                }
-                else if (DateFrom == null && DateUntil != null)
-                {
-                    alarms = alarms.Where(t => t.TimeStamp <= DateUntil);
-                }
-                else if (DateFrom != null && DateUntil == null)
-                {
-                    alarms = alarms.Where(t => t.TimeStamp >= DateFrom);
-                }
+                int unixDateFrom = dateFromOffset.HasValue ? (int)dateFromOffset.Value.ToUnixTimeSeconds() : 0;
+                int unixDateUntil = dateUntilOffset.HasValue ? (int)dateUntilOffset.Value.ToUnixTimeSeconds() : (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+                var result = (from p in _context.Alarms
+                              select p).OrderBy(t => t.AlarmID).Reverse().Where(t => t.TimeStamp >= unixDateFrom && t.TimeStamp <= unixDateUntil);
+
+                // Get the data model from your database or other source
+                var alarms = from p in result
+                             select new
+                             {
+                                 p.AlarmID,
+                                 p.AlarmStatus,
+                                 p.LocationName,
+                                 p.Pressure,
+                                 TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
+                             };
 
                 // Write the data model to the cells in the sheet
                 int rowIndex = 8;

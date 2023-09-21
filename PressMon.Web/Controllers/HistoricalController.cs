@@ -17,7 +17,7 @@ namespace TMS.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly DataContext _context;
-        public HistoricalController(ILogger<HistoricalController> logger,DataContext context)
+        public HistoricalController(ILogger<HistoricalController> logger, DataContext context)
         {
             _context = context;
         }
@@ -38,34 +38,26 @@ namespace TMS.Web.Controllers
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int recordsTotal = 0;
 
-
                 DateTimeOffset DateFrom = DateTimeOffset.Parse(Request.Form["DateFrom"]);
                 DateTimeOffset DateUntil = DateTimeOffset.Parse(Request.Form["DateUntil"]);
 
-                int unixDateFrom =(int) DateFrom.ToUnixTimeSeconds();
-                int unixDateTo = (int)DateUntil.ToUnixTimeSeconds();
-                // Get all data from the database
-                //var historicals = _context.Historicals.ToList().Select(p => new
-                //{
-                //    p.HistoricalID,
-                //    p.LocationName,
-                //    p.Pressure,
-                //    TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
-                //}).OrderBy(t => t.HistoricalID).Reverse();
-                var result= (from p in _context.Historicals
-                                   select p).OrderBy(t => t.HistoricalID).Reverse().Where(t=>t.TimeStamp>=unixDateFrom && t.TimeStamp<=unixDateTo).ToList();
-               
+                int unixDateFrom = (int)DateFrom.ToUnixTimeSeconds();
+                int unixDateUntil = (int)DateUntil.ToUnixTimeSeconds();
 
-                var historicals = from p in result select new
-                {
-                    p.HistoricalID,
-                    p.LocationName,
-                    p.Pressure,
-                    TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
-                };
+                var result = (from p in _context.Historicals
+                              select p).OrderBy(t => t.HistoricalID).Reverse().Where(t => t.TimeStamp >= unixDateFrom && t.TimeStamp <= unixDateUntil).ToList();
+
+                var historicals = from p in result
+                                  select new
+                                  {
+                                      p.HistoricalID,
+                                      p.LocationName,
+                                      p.Pressure,
+                                      TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
+                                  };
 
                 // Total number of rows counts   
-                recordsTotal = historicals == null? 0:result.Count();
+                recordsTotal = historicals == null ? 0 : result.Count();
                 //Paging   
                 var data = historicals.Skip(skip).Take(pageSize).ToList();
                 //Returning Json Data  
@@ -94,34 +86,32 @@ namespace TMS.Web.Controllers
 
                 // Set Date Export
                 IRow rowDate = sheet.CreateRow(5);
-                rowDate.CreateCell(1).SetCellValue("Date Export : ");
-                rowDate.CreateCell(2).SetCellValue(DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"));
+                rowDate.CreateCell(0).SetCellValue("Date Export : ");
+                rowDate.CreateCell(1).SetCellValue(DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"));
+
+                // Convert DateTime? to DateTimeOffset?
+                DateTimeOffset? dateFromOffset = DateFrom.HasValue ? new DateTimeOffset(DateFrom.Value) : null;
+                DateTimeOffset? dateUntilOffset = DateUntil.HasValue ? new DateTimeOffset(DateUntil.Value) : null;
+
+                int unixDateFrom = dateFromOffset.HasValue ? (int)dateFromOffset.Value.ToUnixTimeSeconds() : 0;
+                int unixDateUntil = dateUntilOffset.HasValue ? (int)dateUntilOffset.Value.ToUnixTimeSeconds() : (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+
+                var result = (from p in _context.Historicals
+                              select p).OrderBy(t => t.HistoricalID).Reverse().Where(t => t.TimeStamp >= unixDateFrom && t.TimeStamp <= unixDateUntil).ToList();
 
                 // Get the data model from your database or other source
-                var historicals = _context.Historicals.ToList().Select(p => new
-                {
-                    p.HistoricalID,
-                    p.LocationName,
-                    p.Pressure,
-                    TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
-                });
-
-                // Filter data based on the selected date range
-                if (DateFrom != null && DateUntil != null)
-                {
-                    historicals = historicals.Where(t => t.TimeStamp >= DateFrom && t.TimeStamp <= DateUntil);
-                }
-                else if (DateFrom == null && DateUntil != null)
-                {
-                    historicals = historicals.Where(t => t.TimeStamp <= DateUntil);
-                }
-                else if (DateFrom != null && DateUntil == null)
-                {
-                    historicals = historicals.Where(t => t.TimeStamp >= DateFrom);
-                }
+                var historicals = from p in result
+                                  select new
+                                  {
+                                      p.HistoricalID,
+                                      p.LocationName,
+                                      p.Pressure,
+                                      TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
+                                  };
 
                 // Write the data model to the cells in the sheet
-                int rowIndex = 9;
+                int rowIndex = 8;
                 int number = 1;
                 // Start at row 1 (0-based index) to skip the header row
                 foreach (var h in historicals)
@@ -149,12 +139,12 @@ namespace TMS.Web.Controllers
 
                 return file;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw;
             }
 
-            
+
         }
 
         private static DateTime UnixTimeStampToDateTime(int unixTimeStamp)
