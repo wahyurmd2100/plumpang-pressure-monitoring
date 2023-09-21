@@ -1,4 +1,4 @@
-﻿@model TMS.Web.Models.Historical
+﻿@model TMS.Web.Models.Alarm
 @{
     ViewData["Title"] = "Alarms Log";
     Layout = "~/Views/Shared/_LayoutNew.cshtml";
@@ -9,36 +9,89 @@
         <script type="text/javascript" asp-append-version="true">
             var oTable;
             $(document).ready(function () {
-                oTable = $('#tb-alarms').DataTable(
-                    {
-                        "serverSide": true, // for process server side
-                        "scrollY": true,
-                        "scrollX": true,
-                        "autoWidth": false,
-                        "scrollCollapse": true,
-                        "paging": true,
-                        "fixedColumns": true,
-                        "processing": true,
-                        "ajax": {
-                            "url": "@Url.Action("LoadData")",
-                            "type": "POST",
-                            "datatype": "json"
-                        },
-                        "columnDefs": [{
-                            "targets": 0,
-                            "visible": false,
-                            "searchable": false
-                        }],
-                        "columns": [
-                            { "data": "alarmID", "name": "AlarmID", "autoWidth": true },
-                            { "data": "alarmStatus", "name": "AlarmStatus", "autoWidth": true },
-                            { "data": "locationName", "name": "LocationName", "autoWidth": true },
-                            { "data": "pressure", "name": "Pressure", "autoWidth": true },
-                            { "data": "timeStamp", "name": "TimeStamp", "autoWidth": true },
-                        ]
-                    }
-                );
+                oTable = $('#tb-alarms').DataTable({
+                    "serverSide": true, // for process server side
+                    "scrollY": true,
+                    "scrollX": true,
+                    "autoWidth": false,
+                    "scrollCollapse": true,
+                    "paging": true,
+                    "fixedColumns": true,
+                    "processing": true,
+                    "ajax": {
+                        "url": "@Url.Action("LoadData")",
+                        "type": "POST",
+                        "datatype": "json",
+                        // "success" : function (data){
+                        //     console.log(data);
+                        // }
+                        "data": function (d) {
+                            d.datefrom = document.getElementById("dateFrom").value;
+                            d.dateuntil = document.getElementById("dateUntil").value;
+                        }
+                    },
+                    "columnDefs": [{
+                        "targets": 0,
+                        "visible": false,
+                        "searchable": false
+                    }],
+                    "columns": [
+                        { "data": "alarmID", "name": "AlarmID", "autoWidth": true },
+                        { "data": "alarmStatus", "name": "AlarmStatus", "autoWidth": true },
+                        { "data": "locationName", "name": "LocationName", "autoWidth": true },
+                        { "data": "pressure", "name": "Pressure", "autoWidth": true },
+                        { "data": "timeStamp", "name": "TimeStamp", "autoWidth": true },
+                    ]
+                });
+
+                // Create date inputs
+                minDate = new DateTime($('#dateFrom'), {
+                    format: 'D MMMM yyyy HH:mm:ss'
+                });
+                maxDate = new DateTime($('#dateUntil'), {
+                    format: 'D MMMM yyyy HH:mm:ss'
+                });
+
             });//end document ready
+
+            document.getElementById("btnResetFilter").addEventListener("click", reset);
+            function reset() {
+                document.getElementById("dateFrom").value = "";
+                document.getElementById("dateUntil").value = "";
+                reloadTable();
+            }
+
+            document.getElementById("btnExportToExcel").addEventListener("click", exportToExcel);
+            function exportToExcel() {
+                var dateFrom = document.getElementById("dateFrom").value;
+                var dateUntil = document.getElementById("dateUntil").value;
+
+                $.ajax({
+                    url: '@Url.Action("ExportToExcel")',
+                    method: 'POST',
+                    data: { DateFrom: dateFrom, DateUntil: dateUntil },
+                    xhrFields: {
+                        responseType: 'blob'
+                    },
+                    success: function (response) {
+                        // Create a hidden link to download the file
+                        var link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(new Blob([response]));
+                        link.download = 'Pressure Transmitter Alarms Log.xlsx';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle the error
+                        console.log(xhr.responseText);
+                    }
+                });
+            }
+
+            function reloadTable() {
+                oTable.ajax.reload(null, false);
+            }
         </script>
     }
 </head>
@@ -58,6 +111,31 @@
     <div class="card shadow-lg rounded" style="font-size:12px;">
         <div class="card-header bg-gradient-info p-1"></div>
         <div class="card-body">
+
+            <!-- Filter -->
+            <form>
+                <div class="form-row">
+                    <div class="form-group col-md-3">
+                        <input class="form-control" id="dateFrom" placeholder="Date From" onchange="reloadTable();" type="text" value="@DateTime.Now.ToString("dd MMMM yyyy 00:00:00")">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <input class="form-control" id="dateUntil" placeholder="Date Until" onchange="reloadTable();" type="text" value="@DateTime.Now.ToString("dd MMMM yyyy HH:mm:ss")">
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Spacer -->
+                    </div>
+                    <div class="col-md-3 text-right">
+                        <button type="button" class="btn btn-success" id="btnExportToExcel">
+                            Export Excel
+                        </button>
+                        <button type="button" class="btn btn-info" id="btnResetFilter">
+                            Reset Filter
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+
             <!-- Divider -->
             <hr class="sidebar-divider my-3">
 
