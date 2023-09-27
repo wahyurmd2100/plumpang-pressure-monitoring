@@ -4,11 +4,16 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
 using PressMon.Web.Data;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TMS.Web.Hubs;
 using TMS.Web.Models;
+using TMS.Web.Models.sendWA;
 using static TMS.Web.Apis.LiveDataController;
 
 namespace TMS.Web.Apis
@@ -119,6 +124,7 @@ namespace TMS.Web.Apis
             if (liveData.Pressure <= Lpoint && liveData.Pressure > LLpoint)
             {
                 alarm = new Alarm { AlarmStatus = "L", LocationName = liveData.LocationName, Pressure = liveData.Pressure, TimeStamp = liveData.TimeStamp };
+                sendWA();
             }
             else if (liveData.Pressure >= Hpoint && liveData.Pressure < HHpoint)
             {
@@ -137,6 +143,59 @@ namespace TMS.Web.Apis
             {
                 //WApostStatus(alarm);
                 _context.Add(alarm);
+            }
+        }
+
+        private async Task sendWA()
+        {
+            var apiUrl = "https://multichannel.qiscus.com/whatsapp/v1/uwqks-1zpihp7ouot8pyv/4394/messages";
+            var httpClient = new HttpClient();
+
+            httpClient.DefaultRequestHeaders.Add("Qiscus-App-Id", "uwqks-1zpihp7ouot8pyv");
+            httpClient.DefaultRequestHeaders.Add("Qiscus-Secret-Key", "407e74a091d93e91db35b5c8c1b0b708");
+            var responseMsg = "";
+
+            var pressPT01 = _context.LiveDatas.FirstOrDefault(n => n.LocationName == "M-01");
+            var pressPT02 = _context.LiveDatas.FirstOrDefault(n => n.LocationName == "M-02");
+            var timestamp = DateTime.Now.ToString("dd/MMM/yy HH:mm");
+            var numWAList = _context.WaContactLists
+                            .Select(c => c.ContactNumber)
+                            .ToList();
+
+            foreach (var numWA in numWAList)
+            {
+                // Prepare your data to be sent in the POST request
+                var parameters = new List<Parameter>
+                    {
+                        new Parameter { type = "text", text = pressPT01.Pressure.ToString() }, // Replace "4.4" with your actual value
+                        new Parameter { type = "text", text = pressPT02.Pressure.ToString() }, // Replace "4.8" with your actual value
+                        new Parameter { type = "text", text = timestamp } // Replace with your actual date value
+                    };
+                var components = new List<Component>
+                    {
+                        new Component { type = "body", parameters = parameters }
+                    };
+                var language = new Language { policy = "deterministic", code = "id" };
+                var template = new Template { @namespace = "6e85836a_6b63_48a8_9d2f_e8c8c365e157", name = "pressure_manual_send", language = language, components = components };
+                var requestData = new RequestMessage() { to = numWA, type = "template", template = template };
+
+                // Serialize the data to JSON
+                var jsonPayload = JsonSerializer.Serialize(requestData);
+
+                // Prepare the HTTP content with the JSON payload
+                var httpContent = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                var response = await httpClient.PostAsync(apiUrl, httpContent);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    responseMsg = $"Response : {responseContent}";
+                }
+                else
+                {
+                    responseMsg = $"Error : {response.StatusCode} - {response.ReasonPhrase}";
+                }
             }
         }
 
