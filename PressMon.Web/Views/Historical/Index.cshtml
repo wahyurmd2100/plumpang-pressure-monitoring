@@ -27,6 +27,7 @@
                         "data": function (d) {
                             d.datefrom = document.getElementById("date-From").value;
                             d.dateuntil = document.getElementById("date-Until").value;
+                            d.dateFilter = document.getElementById("date-Filter").value;
                         }
                     },
                     "columnDefs": [{
@@ -38,7 +39,21 @@
                         { "data": "historicalID", "name": "HistoricalID", "autoWidth": true },
                         { "data": "locationName", "name": "LocationName", "autoWidth": true },
                         { "data": "pressure", "name": "Pressure", "autoWidth": true },
-                        { "data": "timeStamp", "name": "TimeStamp", "autoWidth": true },
+                        {
+                            "data": "timeStamp",
+                            "name": "TimeStamp",
+                            "autoWidth": true,
+                            "render": function (data, type, row) {
+                                if (type === 'display' || type === 'filter') {
+                                    // Convert the timestamp to the desired format
+                                    var timestamp = new Date(data);
+                                    var formattedTimestamp = `${timestamp.getDate().toString().padStart(2, '0')}-${(timestamp.getMonth() + 1).toString().padStart(2, '0')}-${timestamp.getFullYear()} ${timestamp.getHours().toString().padStart(2, '0')}:${timestamp.getMinutes().toString().padStart(2, '0')}:${timestamp.getSeconds().toString().padStart(2, '0')}`;
+                                    return formattedTimestamp;
+                                }
+                                // For sorting and other purposes, return the original data
+                                return data;
+                            }
+                        },
                     ]
                 });
 
@@ -119,9 +134,15 @@
                     <div class="form-group col-md-3">
                         <input class="form-control" id="date-Until" placeholder="Date Until" onchange="reloadTable();" type="text" value="@DateTime.Now.ToString("dd MMMM yyyy HH:mm:ss")">
                     </div>
-                    <div class="col-md-3">
-                        <!-- Spacer -->
+                    <div class="form-group col-md-3">
+                        <select class="form-control" id="date-Filter" onchange="reloadTable();" data-placeholder="Select Time">
+                            <option selected value="AllTime">All Time</option>
+                            <option value="Today">Today</option>
+                            <option value="Hourly">Hourly</option>
+                            <option value="Minutely">Minutely</option>
+                        </select>
                     </div>
+                    
                     <div class="col-md-3 text-right">
                         <button type="button" class="btn btn-success" id="btnExportToExcel" onclick="exportToExcel()">
                             Export Excel

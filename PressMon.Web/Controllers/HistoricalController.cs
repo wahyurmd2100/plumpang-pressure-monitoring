@@ -40,9 +40,22 @@ namespace TMS.Web.Controllers
 
                 DateTimeOffset DateFrom = DateTimeOffset.Parse(Request.Form["DateFrom"]);
                 DateTimeOffset DateUntil = DateTimeOffset.Parse(Request.Form["DateUntil"]);
+                var dateFilter = Request.Form["dateFilter"].FirstOrDefault();
+                DateTimeOffset currentDate = DateTime.Now.Date; // Get the current date without the time component.
+                DateTimeOffset nextDay = currentDate.AddDays(1); // Get the start of the next day.
+                DateTimeOffset currentDateTime = DateTime.Now;
+                DateTimeOffset oneHourAgo = currentDateTime.AddHours(-1);
+                DateTimeOffset oneMinuteAgo = currentDateTime.AddMinutes(-1);
+
 
                 int unixDateFrom = (int)DateFrom.ToUnixTimeSeconds();
                 int unixDateUntil = (int)DateUntil.ToUnixTimeSeconds();
+                int unixCurrentDate = (int)currentDate.ToUnixTimeSeconds();
+                int unixNextDay = (int)nextDay.ToUnixTimeSeconds();
+                int unixCurrentDateTime = (int)currentDateTime.ToUnixTimeSeconds();
+                int unixOneHourAgo = (int)oneHourAgo.ToUnixTimeSeconds();
+                int unixOneMinuteAgo = (int) oneMinuteAgo.ToUnixTimeSeconds();
+
 
                 var result = (from p in _context.Historicals
                               select p).OrderBy(t => t.HistoricalID).Reverse().Where(t => t.TimeStamp >= unixDateFrom && t.TimeStamp <= unixDateUntil).ToList();
@@ -56,6 +69,68 @@ namespace TMS.Web.Controllers
                                       TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
                                   };
 
+                if (dateFilter != "AllTime") 
+                {
+                    result = (from p in _context.Historicals
+                     select p).OrderBy(t => t.HistoricalID).Reverse().Where(t => t.TimeStamp >= unixDateFrom && t.TimeStamp <= unixDateUntil).ToList();
+
+                    historicals = from p in result
+                                  select new
+                                  {
+                                      p.HistoricalID,
+                                      p.LocationName,
+                                      p.Pressure,
+                                      TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
+                                  };
+
+                    if (dateFilter == "Today")
+                    {
+                        result = (from p in _context.Historicals
+                                  select p).OrderBy(t => t.HistoricalID).Reverse().Where(p => p.TimeStamp >= unixCurrentDate && p.TimeStamp < unixNextDay).ToList();
+
+                        historicals = from p in result
+                                      select new
+                                      {
+                                          p.HistoricalID,
+                                          p.LocationName,
+                                          p.Pressure,
+                                          TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
+                                      };
+                    }
+
+                    if (dateFilter == "Hourly")
+                    {
+                        result = (from p in _context.Historicals
+                                  select p).OrderBy(t => t.HistoricalID).Reverse().Where(p => p.TimeStamp >= unixOneHourAgo && p.TimeStamp <= unixCurrentDateTime).ToList();
+
+                        historicals = from p in result
+                                      select new
+                                      {
+                                          p.HistoricalID,
+                                          p.LocationName,
+                                          p.Pressure,
+                                          TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
+                                      };
+
+                    }
+
+                    if (dateFilter == "Minutely")
+                    {
+                        result = (from p in _context.Historicals
+                                  select p).OrderBy(t => t.HistoricalID).Reverse().Where(p => p.TimeStamp >= unixOneMinuteAgo && p.TimeStamp <= unixCurrentDateTime).ToList();
+
+                        historicals = from p in result
+                                      select new
+                                      {
+                                          p.HistoricalID,
+                                          p.LocationName,
+                                          p.Pressure,
+                                          TimeStamp = UnixTimeStampToDateTime(p.TimeStamp)
+                                      };
+                    }
+                }
+
+                
                 // Total number of rows counts   
                 recordsTotal = historicals == null ? 0 : result.Count();
                 //Paging   
