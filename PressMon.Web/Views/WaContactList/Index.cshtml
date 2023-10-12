@@ -41,9 +41,12 @@
                         {
                             data: null,
                             render: function (data, type, full, meta) {
-                                return `
-                                    <input type="checkbox" value="${full.contactID}" class="select-checkbox">
-                                `;
+                                if (full.checkStatus == 0) {
+                                    return ` <input type="checkbox" value="${full.contactID}" class="select-checkbox" onChange="cbContact(this)">`;
+                                } else {
+                                    return ` <input type="checkbox" value="${full.contactID}" class="select-checkbox" onChange="cbContact(this)" checked> `;
+                                }
+                                
                             }
                         },
                         {
@@ -60,10 +63,31 @@
                             }
                         },
                         { "data": "contactName", "name": "ContactName", "autoWidth": true },
-                        { "data": "contactNumber", "name": "contactNumber", "autoWidth": true },
+                        { "data": "contactNumber", "name": "ContactNumber", "autoWidth": true },
+                        { "data": "isActived", "name": "IsActived", "autoWidth": true },
                     ]
                 });
             });
+
+            function cbContact(data){
+                var id = data.value;
+                var chkStat = data.checked;
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateCheckStatus")",
+                    data: { 
+                        contactID : id,
+                        checkStatus : chkStat
+                    },
+                    success: function (res) {
+                        // Handle the response, if needed
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            }
 
             function UpdateData(contactID) {
                 var toSend =

@@ -51,7 +51,9 @@ namespace TMS.Web.Controllers
                                {
                                    p.ContactID,
                                    p.ContactName,
-                                   p.ContactNumber
+                                   p.ContactNumber,
+                                   p.CheckStatus,
+                                   p.IsActived
                                });
 
                 if (!string.IsNullOrEmpty(searchValue))
@@ -94,8 +96,7 @@ namespace TMS.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddOrEdit(int id, [Bind("ContactID, ContactName, ContactNumber")] WaContactList waContactList
-            )
+        public async Task<IActionResult> AddOrEdit(int id, [Bind("ContactID, ContactName, ContactNumber, IsActived")] WaContactList waContactList)
         {
 
             if (ModelState.IsValid)
@@ -129,7 +130,31 @@ namespace TMS.Web.Controllers
                 return Json(new { isValid = true, html = Helper.RenderRazorViewString(this, "_ViewAll", _context.WaContactLists.ToList()) });
             }
             return Json(new { isValid = false, html = Helper.RenderRazorViewString(this, "AddOrEdit", waContactList) });
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> UpdateCheckStatus(int contactID, bool checkStatus)
+        {
+            try
+            {
+                var contact = await _context.WaContactLists.FindAsync(contactID);
+
+                if (contact != null)
+                {
+                    // Update the CheckStatus property in the database based on the isChecked value
+                    contact.CheckStatus = checkStatus;
+                    await _context.SaveChangesAsync();
+
+                    return Json(new { success = true, message = "CheckStatus updated successfully." });
+                }
+
+                return Json(new { success = false, message = "Contact not found." });
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions and errors here
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost, ActionName("Delete")]

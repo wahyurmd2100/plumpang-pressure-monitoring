@@ -10,5 +10,7 @@ namespace TMS.Web.Models
         public int ContactID { get; set; }
         public string ContactName { get; set; }
         public string ContactNumber { get; set; }
+        public bool CheckStatus { get; set; }
+        public bool IsActived { get; set; }
     }
 }

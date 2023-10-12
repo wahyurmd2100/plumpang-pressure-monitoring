@@ -20,9 +20,8 @@ namespace TMS.Web.Apis
         [HttpGet]
         public ActionResult<IEnumerable<WaContactList>> GetWaContactList()
         {
-            var contactList = _context.WaContactLists.ToList();
-            var pressData = _context.LiveDatas.ToList();
-            return Ok(new {Contacts = contactList, Data = pressData});
+            var contactList = _context.WaContactLists.ToList().Where(t => t.IsActived);
+            return Ok(new {Contacts = contactList});
         }
     }
 }

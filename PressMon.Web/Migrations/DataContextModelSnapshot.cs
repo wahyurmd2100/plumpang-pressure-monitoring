@@ -330,11 +330,17 @@ namespace TMS.Web.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("CheckStatus")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("ContactName")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ContactNumber")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActived")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ContactID");
 
